@@ -1,18 +1,24 @@
 // React Import
+import { Categories, Folders } from "@/data/foods";
 import React, { createContext, useContext, useState } from "react";
 
 interface GlobalContextType {
-  restaurant: any;
-  setRestaurant: (restaurant: any) => void;
+  categories: any;
+  setCategories: (categories: any) => void;
+  folders: any;
+  setFolders: (folders: any) => void;
 }
 
 const Context = createContext<GlobalContextType | undefined>(undefined);
 
 const GlobalStore = ({ children }: { children: React.ReactNode }) => {
-  const [restaurant, setRestaurant] = useState(null);
+  const [categories, setCategories] = useState(Categories);
+  const [folders, setFolders] = useState(Folders);
 
   return (
-    <Context.Provider value={{ restaurant, setRestaurant }}>
+    <Context.Provider
+      value={{ categories, setCategories, folders, setFolders }}
+    >
       {children}
     </Context.Provider>
   );
