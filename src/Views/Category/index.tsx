@@ -57,7 +57,7 @@ const CategoryView: FC<IPropTypes> = () => {
         {/* Body */}
         <div className="flex-col h-full pt-[18px] px-[20px] bg-[#FFF6DF]">
           <div className="flex flex-row justify-between items-center mt-[30px] mb-[17px]">
-            <p className="font-bold text-[#852E2C] text-[20px] font-monserrat">
+            <p className="font-bold text-[#852E2C] text-[20px]">
               Add New Category
             </p>
             <svg viewBox="0 0 15 15" height={25}>

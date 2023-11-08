@@ -20,6 +20,8 @@ import { v4 } from "uuid";
 import CategoryCard from "@/components/CategoryCard";
 import { ScreensTypes } from "@/enums";
 import { toast } from "react-toastify";
+import InfiniteScroll from "react-infinite-scroll-component";
+import FolderCard from "@/components/FolderCard";
 
 // Functions Import
 
@@ -83,6 +85,18 @@ const HomeView: FC<HomeProps> = () => {
     );
   };
 
+  const [dataLimit, setDataLimit] = useState(2);
+  const [more, ssetMore] = useState(true);
+
+  const dataCount = folders.length + categories.length;
+
+  console.log({ dataLimit, dataCount });
+
+  const fetchMore = () => {
+    setDataLimit((prev) => prev + 2);
+    return;
+  };
+
   return (
     <Fragment>
       <div className="w-screen h-full max-w-[390px] mx-auto mb-auto">
@@ -134,85 +148,71 @@ const HomeView: FC<HomeProps> = () => {
             </p>
           </div>
 
-          {/* Menu Folders */}
-          {queryFolders
-            ? queryFolders.map((folder: any, idx: number) => (
-                <div
-                  key={`${folder.id} ${idx}`}
-                  className="border-[3px] border-[#852E2C] rounded-[10px] p-3 my-3"
-                >
-                  {/* Folder Header */}
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex flex-row items-center">
-                      <AiOutlineMenu className="text-[#852E2C] font-bold cursor-pointer" />
-                      <p className="font-bold text-[20px] mx-2 text-[#852E2C]">
-                        {folder.name}
-                      </p>
-                    </div>
-                    <div className="flex flex-row gap-2">
-                      <IoMdSettings
-                        color="#852E2C"
-                        className="cursor-pointer"
+          <InfiniteScroll
+            dataLength={dataCount} //This is important field to render the next data
+            next={fetchMore}
+            hasMore={dataLimit < dataCount}
+            loader={<h4>Loading...</h4>}
+            endMessage={
+              <p style={{ textAlign: "center" }}>
+                <b>Yay! You have seen it all</b>
+              </p>
+            }
+          >
+            {/* Menu Folders */}
+            {queryFolders
+              ? queryFolders.map((folder: any, idx: number) => {
+                  if (idx + 1 > dataLimit) return;
+                  else
+                    return (
+                      <FolderCard
+                        key={`${folder.id} ${idx}`}
+                        folder={folder}
+                        handleDelete={deleteFolder}
+                        handleEdit={editFolder}
                       />
-                      <MdModeEdit
-                        color="#852E2C"
-                        className="cursor-pointer"
-                        onClick={() => editFolder("folder", folder.id)}
+                    );
+                })
+              : folders.map((folder: any, idx: number) => {
+                  if (idx + 1 > dataLimit) return;
+                  else
+                    return (
+                      <FolderCard
+                        key={`${folder.id} ${idx}`}
+                        folder={folder}
+                        handleDelete={deleteFolder}
+                        handleEdit={editFolder}
                       />
-                      <MdDelete
-                        color="#852E2C"
-                        className="cursor-pointer"
-                        onClick={() => deleteFolder(folder.id)}
-                      />
-                    </div>
-                  </div>
+                    );
+                })}
 
-                  {/* Folder Categories */}
-                  {folder.categories.map((category: any, idx: number) => (
-                    <CategoryCard key={idx} category={category} />
-                  ))}
-                </div>
-              ))
-            : folders.map((folder: any, idx: number) => (
-                <div
-                  key={`${folder.id} ${idx}`}
-                  className="border-[3px] border-[#852E2C] rounded-[10px] p-3 my-3"
-                >
-                  {/* Folder Header */}
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex flex-row items-center">
-                      <AiOutlineMenu className="text-[#852E2C] font-bold" />
-                      <p className="font-bold text-[20px] mx-2 text-[#852E2C]">
-                        {folder.name}
-                      </p>
-                    </div>
-                    <div className="flex flex-row gap-2">
-                      <IoMdSettings
-                        color="#852E2C"
-                        className="cursor-pointer"
-                      />
-                      <MdModeEdit
-                        color="#852E2C"
-                        className="cursor-pointer"
-                        onClick={() => editFolder("folder", folder.id)}
-                      />
-                      <MdDelete
-                        color="#852E2C"
-                        className="cursor-pointer"
-                        onClick={() => deleteFolder(folder.id)}
-                      />
-                    </div>
-                  </div>
+            {/* All Categories */}
 
-                  {/* Folder Categories */}
-                  {folder.categories.map((category: any, idx: number) => (
-                    <CategoryCard key={idx} category={category} />
-                  ))}
-                </div>
-              ))}
+            <div className="px-3 my-4">
+              {queryCategories
+                ? queryCategories?.map((category: any, idx: number) => {
+                    if (idx + 1 + folders.length > dataLimit) return;
+                    return (
+                      <CategoryCard
+                        key={`${category.id}-${idx}`}
+                        category={category}
+                        handleDelete={deleteCategory}
+                      />
+                    );
+                  })
+                : categories?.map((category: any, idx: number) => {
+                    if (idx + 1 + folders.length > dataLimit) return;
+                    return (
+                      <CategoryCard
+                        key={`${category.id}-${idx}`}
+                        category={category}
+                        handleDelete={deleteCategory}
+                      />
+                    );
+                  })}
+            </div>
 
-          {/* All Categories */}
-          <div className="px-3 my-4">
+            {/* <div className="px-3 my-4">
             {queryCategories
               ? queryCategories?.map((category: any, idx: number) => (
                   <CategoryCard
@@ -228,24 +228,25 @@ const HomeView: FC<HomeProps> = () => {
                     handleDelete={deleteCategory}
                   />
                 ))}
-          </div>
+          </div> */}
 
-          {/* Ad New Categories */}
-          <div
-            className="flex flex-col justify-center gap-2 items-center border-2 border-[#852E2C] rounded-[15px] h-[344px] px-2"
-            style={{ borderRadius: "10% 90% 10% 90% / 95% 8% 92% 10%" }}
-            onClick={addCategory}
-          >
-            <svg viewBox="0 0 15 15" height={50}>
-              <IoMdAddCircleOutline
-                color="#852E2C"
-                className="cursor-pointer"
-              />
-            </svg>
-            <p className="text-[#852E2C] font-monserrat font-semibold max-w-[192px] text-center mt-4">
-              ADD NEW CATEGORY TO YOUR MENU
-            </p>
-          </div>
+            {/* Ad New Categories */}
+            <div
+              className="flex flex-col justify-center gap-2 items-center border-2 border-[#852E2C] rounded-[15px] h-[344px] px-2"
+              style={{ borderRadius: "10% 90% 10% 90% / 95% 8% 92% 10%" }}
+              onClick={addCategory}
+            >
+              <svg viewBox="0 0 15 15" height={50}>
+                <IoMdAddCircleOutline
+                  color="#852E2C"
+                  className="cursor-pointer"
+                />
+              </svg>
+              <p className="text-[#852E2C] font-monserrat font-semibold max-w-[192px] text-center mt-4">
+                ADD NEW CATEGORY TO YOUR MENU
+              </p>
+            </div>
+          </InfiniteScroll>
         </div>
       </div>
     </Fragment>
