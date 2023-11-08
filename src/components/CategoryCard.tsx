@@ -32,6 +32,7 @@ function CategoryCard({
           <div className="flex flex-row gap-2">
             <IoMdSettings
               color="#FFFFFF"
+              className="cursor-pointer"
               onClick={
                 handleSettings
                   ? () => handleSettings(category.id)
@@ -40,6 +41,7 @@ function CategoryCard({
             />
             <MdModeEdit
               color="#FFFFFF"
+              className="cursor-pointer"
               onClick={
                 handleEdit
                   ? () => handleEdit(category.id)
@@ -48,6 +50,7 @@ function CategoryCard({
             />
             <MdDelete
               color="#FFFFFF"
+              className="cursor-pointer"
               onClick={
                 handleDelete
                   ? () => handleDelete(category.id)

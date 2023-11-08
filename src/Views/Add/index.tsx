@@ -97,7 +97,7 @@ const AddView: FC<AddProps> = () => {
                 ? "Edit Category Folder"
                 : "Create New Category Folder"}
             </p>
-            <svg viewBox="0 0 15 15" height={25}>
+            <svg viewBox="0 0 15 15" height={25} className="cursor-pointer">
               <MdCancel color="#852E2C" onClick={handleCancel} />
             </svg>
           </div>

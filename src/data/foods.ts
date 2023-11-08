@@ -8,8 +8,8 @@ export const Categories = [
   },
   {
     id: 2,
-    name: "Sandwitches",
-    description: "This is description of the Sandwitches normal category.",
+    name: "Sandwiches",
+    description: "This is description of the Sandwiches normal category.",
     image: "www.example.com/pasta",
     items: [1, 2, 3],
   },
@@ -24,7 +24,7 @@ export const Folders = [
       {
         id: 1,
         name: "Pizza",
-        description: "01 Folder Category descriotion here!",
+        description: "01 Folder Category description here!",
         image: "www.example.com/pasta",
         items: [],
         folder: 101,
@@ -40,7 +40,7 @@ export const Folders = [
       {
         id: 1,
         name: "Pasta",
-        description: "02 Folder Category descriotion here!",
+        description: "02 Folder Category description here!",
         image: "www.example.com/pasta",
         items: [1, 1, 1, 1],
         folder: 101,
@@ -48,7 +48,7 @@ export const Folders = [
       {
         id: 2,
         name: "Chicken Broast",
-        description: "02 Folder Category descriotion here!",
+        description: "02 Folder Category description here!",
         image: "www.example.com/pasta",
         items: [],
         folder: 101,

@@ -39,7 +39,9 @@ const HomeView: FC<HomeProps> = () => {
   // If items found in the database
   // const [haveItems, setHaveItems] = useState<boolean>(true);
   const [isSearchActive, setIsSearchActive] = useState<boolean>(false);
+
   const [queryCategories, setQueryCategories] = useState<any>(undefined);
+
   const [queryFolders, setQueryFolders] = useState<any>(undefined);
 
   const [query, setQuery] = useState<string>("");
@@ -83,7 +85,7 @@ const HomeView: FC<HomeProps> = () => {
 
   return (
     <Fragment>
-      <div className="w-screen h-full max-w-[390px] flex flex-col justify-start">
+      <div className="w-screen h-full max-w-[390px] mx-auto mb-auto">
         {/* Body */}
         <div className="flex-col h-full pt-[18px] px-[20px]">
           <p className="font-bold text-[#852E2C] text-[28px] my-2">YOUR MENU</p>
@@ -112,7 +114,7 @@ const HomeView: FC<HomeProps> = () => {
               onClick={() => setIsSearchActive(true)}
               className="flex flex-row justify-center gap-2 items-center border-2 border-[#852E2C] rounded-[15px] h-[37px]"
             >
-              <BsSearch color="#852E2C" />
+              <BsSearch color="#852E2C" className="cursor-pointer" />
               <p className="text-[#852E2C] font-recoleta">SEARCH MENU</p>
             </div>
           )}
@@ -122,7 +124,10 @@ const HomeView: FC<HomeProps> = () => {
             onClick={addFolder}
           >
             <svg viewBox="0 0 15 15" height={20}>
-              <IoMdAddCircleOutline color="#852E2C" />
+              <IoMdAddCircleOutline
+                color="#852E2C"
+                className="cursor-pointer"
+              />
             </svg>
             <p className="text-[#852E2C] font-sans my-3">
               Create Category Folder
@@ -139,19 +144,24 @@ const HomeView: FC<HomeProps> = () => {
                   {/* Folder Header */}
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex flex-row items-center">
-                      <AiOutlineMenu className="text-[#852E2C] font-bold" />
+                      <AiOutlineMenu className="text-[#852E2C] font-bold cursor-pointer" />
                       <p className="font-bold text-[20px] mx-2 text-[#852E2C]">
                         {folder.name}
                       </p>
                     </div>
                     <div className="flex flex-row gap-2">
-                      <IoMdSettings color="#852E2C" />
+                      <IoMdSettings
+                        color="#852E2C"
+                        className="cursor-pointer"
+                      />
                       <MdModeEdit
                         color="#852E2C"
+                        className="cursor-pointer"
                         onClick={() => editFolder("folder", folder.id)}
                       />
                       <MdDelete
                         color="#852E2C"
+                        className="cursor-pointer"
                         onClick={() => deleteFolder(folder.id)}
                       />
                     </div>
@@ -177,13 +187,18 @@ const HomeView: FC<HomeProps> = () => {
                       </p>
                     </div>
                     <div className="flex flex-row gap-2">
-                      <IoMdSettings color="#852E2C" />
+                      <IoMdSettings
+                        color="#852E2C"
+                        className="cursor-pointer"
+                      />
                       <MdModeEdit
                         color="#852E2C"
+                        className="cursor-pointer"
                         onClick={() => editFolder("folder", folder.id)}
                       />
                       <MdDelete
                         color="#852E2C"
+                        className="cursor-pointer"
                         onClick={() => deleteFolder(folder.id)}
                       />
                     </div>
@@ -222,7 +237,10 @@ const HomeView: FC<HomeProps> = () => {
             onClick={addCategory}
           >
             <svg viewBox="0 0 15 15" height={50}>
-              <IoMdAddCircleOutline color="#852E2C" />
+              <IoMdAddCircleOutline
+                color="#852E2C"
+                className="cursor-pointer"
+              />
             </svg>
             <p className="text-[#852E2C] font-monserrat font-semibold max-w-[192px] text-center mt-4">
               ADD NEW CATEGORY TO YOUR MENU
