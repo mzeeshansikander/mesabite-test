@@ -1,9 +1,6 @@
 import Image from "next/image";
 import React from "react";
 
-// Card Static Image
-import thumbnail from "../assets/images/thumbnail_01.png";
-
 // React Icon Imports
 import { IoMdSettings } from "react-icons/io";
 import { MdDelete, MdModeEdit } from "react-icons/md";

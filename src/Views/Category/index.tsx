@@ -5,7 +5,7 @@ import { Folders } from "@/data/foods";
 import { ScreensTypes } from "@/enums";
 import { Button } from "flowbite-react";
 import Image from "next/image";
-import { FC, Fragment, useContext, useState } from "react";
+import { FC, Fragment, useContext, useEffect, useState } from "react";
 import { BsChevronDown, BsUpload } from "react-icons/bs";
 import { BsSearch } from "react-icons/bs";
 import { IoMdAddCircleOutline } from "react-icons/io";
@@ -24,7 +24,8 @@ const CategoryView: FC<IPropTypes> = () => {
   const [name, setName] = useState<string>("");
   const [desc, setDesc] = useState<string>("");
 
-  const { setCategories, setCurrentScreen } = useGlobalStore();
+  const { categories, setCategories, setCurrentScreen, toEdit } =
+    useGlobalStore();
 
   // Form Cancel Handler
   const handleCancel = () => {
@@ -48,6 +49,33 @@ const CategoryView: FC<IPropTypes> = () => {
       },
     ]);
     toast.success("Category Added Successfully!");
+    setCurrentScreen(ScreensTypes.HOME);
+  };
+
+  const editCategory = toEdit?.editType === "category";
+  let selectedCategory;
+
+  useEffect(() => {
+    if (editCategory) {
+      selectedCategory = categories.filter(
+        (category: any) => category.id === toEdit.itemId
+      );
+
+      setName(selectedCategory[0].name);
+      setDesc(selectedCategory[0].description);
+    }
+  }, []);
+
+  const updateCategory = () => {
+    setCategories(
+      categories.map((category: any) => {
+        if (category.id === toEdit.itemId) {
+          return { ...category, name: name, description: desc };
+        }
+        return category;
+      })
+    );
+    toast.success("Category Updated!");
     setCurrentScreen(ScreensTypes.HOME);
   };
 
@@ -110,7 +138,10 @@ const CategoryView: FC<IPropTypes> = () => {
         </div>
 
         {/* Bottom Action Buttons */}
-        <ActionButtons handleCancel={handleCancel} handleSave={handleSave} />
+        <ActionButtons
+          handleCancel={handleCancel}
+          handleSave={editCategory ? updateCategory : handleSave}
+        />
       </div>
     </Fragment>
   );

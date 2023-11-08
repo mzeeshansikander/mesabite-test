@@ -52,6 +52,11 @@ const HomeView: FC<HomeProps> = () => {
     setCurrentScreen(ScreensTypes.CATEGORY);
   };
 
+  const editCategory = (editType: string, itemId: number) => {
+    setToEdit({ editType, itemId });
+    setCurrentScreen(ScreensTypes.CATEGORY);
+  };
+
   const addFolder = () => {
     setCurrentScreen(ScreensTypes.FOLDER);
   };
@@ -187,7 +192,6 @@ const HomeView: FC<HomeProps> = () => {
                 })}
 
             {/* All Categories */}
-
             <div className="px-3 my-4">
               {queryCategories
                 ? queryCategories?.map((category: any, idx: number) => {
@@ -197,6 +201,7 @@ const HomeView: FC<HomeProps> = () => {
                         key={`${category.id}-${idx}`}
                         category={category}
                         handleDelete={deleteCategory}
+                        handleEdit={editCategory}
                       />
                     );
                   })
@@ -207,6 +212,7 @@ const HomeView: FC<HomeProps> = () => {
                         key={`${category.id}-${idx}`}
                         category={category}
                         handleDelete={deleteCategory}
+                        handleEdit={editCategory}
                       />
                     );
                   })}

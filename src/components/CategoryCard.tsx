@@ -44,7 +44,7 @@ function CategoryCard({
               className="cursor-pointer"
               onClick={
                 handleEdit
-                  ? () => handleEdit(category.id)
+                  ? () => handleEdit("category", category.id)
                   : () => console.log("No Handler linked!")
               }
             />
