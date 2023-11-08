@@ -1,84 +1,153 @@
 // React Imports
+import ActionButtons from "@/components/ActionButtons";
+import { useGlobalStore } from "@/context/global";
 import { Folders } from "@/data/foods";
+import { ScreensTypes } from "@/enums";
 import { Button } from "flowbite-react";
 import Image from "next/image";
-import { FC, Fragment, useState } from "react";
-import { BsChevronDown } from "react-icons/bs";
+import { FC, Fragment, useContext, useEffect, useState } from "react";
+import { BsChevronDown, BsUpload } from "react-icons/bs";
 import { BsSearch } from "react-icons/bs";
 import { IoMdAddCircleOutline } from "react-icons/io";
+import { MdCancel } from "react-icons/md";
+import { toast } from "react-toastify";
+
+// For ID
+import { v4 } from "uuid";
 
 // Functions Import
 
 interface AddProps {}
 
 const AddView: FC<AddProps> = () => {
+  // States
+  const [name, setName] = useState<string>("");
+
+  const { folders, setFolders, setCurrentScreen, toEdit } = useGlobalStore();
+
+  console.log(toEdit);
+
+  // Form Cancel Handler
+  const handleCancel = () => {
+    setCurrentScreen(ScreensTypes.HOME);
+  };
+
+  // Form Save Handler
+  const handleSave = () => {
+    if (!name) {
+      toast.error("Please type Folder Name");
+      return;
+    }
+    console.log("Saving...");
+    setFolders((prev: any) => [
+      ...prev,
+      {
+        id: v4(),
+        name: name,
+        image: "www.example.com/foods",
+        categories: [
+          {
+            id: 1,
+            name: "Added Pizza",
+            description: "Added Folder Category descriotion here!",
+            image: "www.example.com/pasta",
+            items: [],
+            folder: 101,
+          },
+        ],
+      },
+    ]);
+    toast.success("Folder Added Successfully!");
+    setCurrentScreen(ScreensTypes.HOME);
+  };
+
+  const editFolder = toEdit?.editType === "folder";
+  let selectedFolder;
+
+  useEffect(() => {
+    if (editFolder) {
+      selectedFolder = folders.filter(
+        (folder: any) => folder.id === toEdit.itemId
+      );
+      setName(selectedFolder[0].name);
+    }
+  }, []);
+
+  const updateFolder = () => {
+    setFolders(
+      folders.map((folder: any) => {
+        if (folder.id === toEdit.itemId) {
+          return { ...folder, name: name };
+        }
+        return folder;
+      })
+    );
+    toast.success("Folder Updated!");
+    setCurrentScreen(ScreensTypes.HOME);
+  };
+
   return (
     <Fragment>
-      <div className="w-screen max-w-[390px] flex flex-col justify-start border">
-        {/* NavBar */}
-        {/* <div className="bg-[#FFCD00] flex justify-between items-center px-4 h-[65px] w-full border-b-2 border-[#852E2C]">
-          <div className="w-[18.57px] h-[11.43px]">
-            <Image
-              alt=""
-              width={0}
-              height={0}
-              sizes="100vw"
-              style={{ width: "100%", height: "auto" }}
-              src="/assets/menuIcon.png"
-            />
-          </div>
-          <div className="flex justify-center items-center gap-2">
-            <div className="w-[24px] h-[24px]">
-              <Image
-                alt=""
-                width={0}
-                height={0}
-                sizes="100vw"
-                style={{ width: "100%", height: "auto" }}
-                src="/assets/en-flag.png"
-              />
-            </div>
-            <BsChevronDown />
-          </div>
-        </div> */}
-
+      <div className="w-screen h-screen max-w-[390px] flex flex-col justify-start">
         {/* Body */}
         <div className="flex-col h-full pt-[18px] px-[20px] bg-[#FFF6DF]">
-          <text className="font-bold text-[#852E2C] text-[28px]">
-            YOUR MENU
-          </text>
-          <div className="flex flex-row justify-center gap-2 items-center border-2 border-[#852E2C] rounded-[15px] h-[37px]">
-            <BsSearch color="#852E2C" />
-            <text className="text-[#852E2C] font-sans">SEARCH MENU</text>
+          <div className="flex flex-row justify-between items-center mt-[30px] mb-[17px]">
+            <p className="font-bold text-[#852E2C] text-[20px] font-monserrat">
+              {editFolder
+                ? "Edit Category Folder"
+                : "Create New Category Folder"}
+            </p>
+            <svg viewBox="0 0 15 15" height={25}>
+              <MdCancel color="#852E2C" onClick={handleCancel} />
+            </svg>
+          </div>
+          {!editFolder && (
+            <p className="text-[#BF5627] text-[12px] text-center font-monserrat">
+              Here you can create Category Folder that
+              <br />
+              <strong>includes other categories under it.</strong>
+            </p>
+          )}
+
+          {/* Name Input Field  */}
+          <div className="mb-[37px] mt-[17px]">
+            <p className="font-semibold font-monserrat text-[#852E2C]">Name</p>
+            <input
+              value={name}
+              onChange={(e) => setName(e.currentTarget.value)}
+              type="text"
+              className="border-[#852E2C] h-[40px] my-2 bg-transparent border-2 rounded-full w-full font-monserrat"
+            />
+            <p className="text-[#BF5627] w-full text-right text-[10px] font-monserrat">
+              {`${name.length}/50`}
+            </p>
           </div>
 
-          <div className="flex flex-row gap-2 items-center mt-2 font-bold">
-            <svg viewBox="0 0 15 15" height={50}>
-              <IoMdAddCircleOutline color="#852E2C" />
+          <p className="font-semibold font-monserrat text-[#852E2C]">
+            Image (Optional)
+          </p>
+
+          <div
+            className="flex flex-col justify-center gap-2 items-center border-4 border-[#852E2C] rounded-[15px] h-[344px] px-2 my-2"
+            style={{ borderRadius: "10% 90% 10% 90% / 95% 8% 92% 5%" }}
+            // style={{
+            //   clipPath: "polygon(50% 0%, 100% 38%, 82% 100%, 9% 96%, 0% 38%)",
+            // }}
+          >
+            <svg viewBox="0 0 16 16" height={80}>
+              <BsUpload color="#852E2C" />
             </svg>
-            <text className="text-[#852E2C] font-sans my-3">
-              Create Category Folder
-            </text>
-          </div>
-          <div className="flex flex-col justify-center gap-2 items-center border-2 border-[#852E2C] rounded-[15px] h-[344px] px-2">
-            <svg viewBox="0 0 15 15" height={50}>
-              <IoMdAddCircleOutline color="#852E2C" />
-            </svg>
-            <text className="text-[#852E2C] font-sans max-w-[192px] text-center mt-4">
-              ADD NEW CATEGORY TO YOUR MENU
-            </text>
+            <p className="text-[#852E2C] font-monserrat text-center mt-4 font-semibold">
+              Click here to upload an image
+            </p>
           </div>
         </div>
 
         {/* Bottom Action Buttons */}
-        <div className="flex flex-row justify-center gap-3 items-center p-2 h-[92px]">
-          <Button className="bg-[#852E2C] text-white h-[50px] w-[150px]">
-            Cancel
-          </Button>
-          <Button className="bg-[#FFCD00] text-[#852E2C] h-[50px] w-[150px]">
-            Save
-          </Button>
-        </div>
+        <ActionButtons
+          handleCancel={handleCancel}
+          handleSave={editFolder ? updateFolder : handleSave}
+        />
       </div>
     </Fragment>
   );

@@ -7,17 +7,32 @@ interface GlobalContextType {
   setCategories: (categories: any) => void;
   folders: any;
   setFolders: (folders: any) => void;
+  currentScreen: any;
+  setCurrentScreen: (currentScreen: any) => void;
+  toEdit: any;
+  setToEdit: (toEdit: any) => void;
 }
 
 const Context = createContext<GlobalContextType | undefined>(undefined);
 
 const GlobalStore = ({ children }: { children: React.ReactNode }) => {
-  const [categories, setCategories] = useState(Categories);
-  const [folders, setFolders] = useState(Folders);
+  const [categories, setCategories] = useState<any>(Categories);
+  const [folders, setFolders] = useState<any>(Folders);
+  const [currentScreen, setCurrentScreen] = useState<string>("home");
+  const [toEdit, setToEdit] = useState<any>();
 
   return (
     <Context.Provider
-      value={{ categories, setCategories, folders, setFolders }}
+      value={{
+        categories,
+        setCategories,
+        folders,
+        setFolders,
+        currentScreen,
+        setCurrentScreen,
+        toEdit,
+        setToEdit,
+      }}
     >
       {children}
     </Context.Provider>

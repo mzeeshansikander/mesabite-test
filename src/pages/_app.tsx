@@ -2,6 +2,13 @@
 import type { AppProps } from "next/app";
 import Context from "../context/global";
 
+// Font Imports
+import { Montserrat } from "next/font/google";
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  variable: "--font-montserrat",
+});
+
 // Styles Import
 import "@/styles/globals.css";
 
@@ -12,7 +19,9 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <Context>
       <HigherOrderComponent>
-        <Component {...pageProps} />
+        <main className={montserrat.variable}>
+          <Component {...pageProps} />
+        </main>
       </HigherOrderComponent>
     </Context>
   );

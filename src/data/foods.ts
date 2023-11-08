@@ -19,7 +19,6 @@ export const Folders = [
   {
     id: 101,
     name: "Foods",
-    description: "All Foods goes here...",
     image: "www.example.com/foods",
     categories: [
       {
