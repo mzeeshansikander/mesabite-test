@@ -1,17 +1,15 @@
-import Image from "next/image";
-import React from "react";
-
 // React Icon Imports
+import { IFolder } from "@/types/folder.interface";
+import { AiOutlineMenu } from "react-icons/ai";
 import { IoMdSettings } from "react-icons/io";
 import { MdDelete, MdModeEdit } from "react-icons/md";
-import { AiOutlineMenu } from "react-icons/ai";
 import CategoryCard from "./CategoryCard";
 
 interface IPropsTypes {
-  folder: any;
-  handleDelete?: any;
-  handleEdit?: any;
-  handleSettings?: any;
+  folder: IFolder;
+  handleDelete?: (id: number) => void;
+  handleEdit?: (type: string, id: number) => void;
+  handleSettings?: (id: number) => void;
 }
 
 function FolderCard({
@@ -21,12 +19,12 @@ function FolderCard({
   handleSettings,
 }: IPropsTypes) {
   return (
-    <div className="border-[3px] border-[#852E2C] rounded-[10px] p-3 my-3">
+    <div className="border-[3px] border-secondary rounded-[10px] p-3 my-3">
       {/* Folder Header */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex flex-row items-center">
-          <AiOutlineMenu className="text-[#852E2C] font-bold" />
-          <p className="font-bold text-[20px] mx-2 text-[#852E2C]">
+          <AiOutlineMenu className="text-secondary font-bold" />
+          <p className="font-bold text-[20px] mx-2 text-secondary">
             {folder.name}
           </p>
         </div>

@@ -5,7 +5,15 @@ import { Folders } from "@/data/foods";
 import { ScreensTypes } from "@/enums";
 import { Button } from "flowbite-react";
 import Image from "next/image";
-import { FC, Fragment, useContext, useEffect, useState } from "react";
+import {
+  FC,
+  Fragment,
+  MutableRefObject,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { BsChevronDown, BsUpload } from "react-icons/bs";
 import { BsSearch } from "react-icons/bs";
 import { IoMdAddCircleOutline } from "react-icons/io";
@@ -23,9 +31,12 @@ const AddView: FC<AddProps> = () => {
   // States
   const [name, setName] = useState<string>("");
 
-  const { folders, setFolders, setCurrentScreen, toEdit } = useGlobalStore();
+  const { folders, setFolders, setCurrentScreen, toEdit, isEditing } =
+    useGlobalStore();
 
-  console.log(toEdit);
+  const [image, setImage] = useState<string | null>(null);
+
+  let fileInputRef = useRef(null);
 
   // Form Cancel Handler
   const handleCancel = () => {
@@ -38,19 +49,23 @@ const AddView: FC<AddProps> = () => {
       toast.error("Please type Folder Name");
       return;
     }
-    console.log("Saving...");
+
     setFolders((prev: any) => [
       ...prev,
       {
         id: v4(),
         name: name,
-        image: "www.example.com/foods",
+        image:
+          image ??
+          "https://nahaj-testing.s3.amazonaws.com/temp/1699496557411.png",
         categories: [
           {
             id: 1,
             name: "Added Pizza",
-            description: "Added Folder Category descriotion here!",
-            image: "www.example.com/pasta",
+            description: "Added Folder Category description here!",
+            image:
+              image ??
+              "https://nahaj-testing.s3.amazonaws.com/temp/1699496557411.png",
             items: [],
             folder: 101,
           },
@@ -58,18 +73,26 @@ const AddView: FC<AddProps> = () => {
       },
     ]);
     toast.success("Folder Added Successfully!");
+
     setCurrentScreen(ScreensTypes.HOME);
   };
 
   const editFolder = toEdit?.editType === "folder";
+
   let selectedFolder;
 
   useEffect(() => {
-    if (editFolder) {
+    if (editFolder && isEditing) {
       selectedFolder = folders.filter(
         (folder: any) => folder.id === toEdit.itemId
       );
       setName(selectedFolder[0].name);
+
+      setImage(selectedFolder[0].image);
+    } else {
+      setName("");
+
+      setImage(null);
     }
   }, []);
 
@@ -77,13 +100,28 @@ const AddView: FC<AddProps> = () => {
     setFolders(
       folders.map((folder: any) => {
         if (folder.id === toEdit.itemId) {
-          return { ...folder, name: name };
+          return { ...folder, name: name, image };
         }
         return folder;
       })
     );
     toast.success("Folder Updated!");
+
     setCurrentScreen(ScreensTypes.HOME);
+  };
+
+  const handleImageUpload = (e: any) => {
+    const file = e.target.files[0];
+
+    if (file) {
+      const reader = new FileReader();
+
+      reader.onload = (event: any) => {
+        setImage(event.target.result as string);
+      };
+
+      reader.readAsDataURL(file);
+    }
   };
 
   return (
@@ -92,8 +130,8 @@ const AddView: FC<AddProps> = () => {
         {/* Body */}
         <div className="flex-col h-full pt-[18px] px-[20px] bg-[#FFF6DF]">
           <div className="flex flex-row justify-between items-center mt-[30px] mb-[17px]">
-            <p className="font-bold text-[#852E2C] text-[20px] font-monserrat">
-              {editFolder
+            <p className="font-bold text-secondary text-[20px] font-monserrat">
+              {editFolder && isEditing
                 ? "Edit Category Folder"
                 : "Create New Category Folder"}
             </p>
@@ -101,44 +139,62 @@ const AddView: FC<AddProps> = () => {
               <MdCancel color="#852E2C" onClick={handleCancel} />
             </svg>
           </div>
-          {!editFolder && (
+          {!isEditing ? (
             <p className="text-[#BF5627] text-[12px] text-center font-monserrat">
               Here you can create Category Folder that
               <br />
               <strong>includes other categories under it.</strong>
             </p>
-          )}
+          ) : null}
 
           {/* Name Input Field  */}
           <div className="mb-[37px] mt-[17px]">
-            <p className="font-semibold font-monserrat text-[#852E2C]">Name</p>
+            <p className="font-semibold font-monserrat text-secondary">Name</p>
             <input
               value={name}
               onChange={(e) => setName(e.currentTarget.value)}
               type="text"
-              className="border-[#852E2C] h-[40px] my-2 bg-transparent border-2 rounded-full w-full font-monserrat"
+              className="border-secondary h-[40px] my-2 bg-transparent border-2 rounded-full w-full font-monserrat"
             />
             <p className="text-[#BF5627] w-full text-right text-[10px] font-monserrat">
               {`${name.length}/50`}
             </p>
           </div>
 
-          <p className="font-semibold font-monserrat text-[#852E2C]">
+          <p className="font-semibold font-monserrat text-secondary">
             Image (Optional)
           </p>
 
+          <input
+            type="file"
+            accept="image/png, image/jpeg"
+            onChange={handleImageUpload}
+            style={{ display: "none" }}
+            ref={(fileInput: unknown | any) => (fileInputRef = fileInput)}
+          />
+
           <div
-            className="flex flex-col justify-center gap-2 items-center border-4 border-[#852E2C] rounded-[15px] h-[344px] px-2 my-2"
+            className="flex flex-col justify-center gap-2 items-center border-4 border-secondary rounded-[15px] h-[344px] px-2 my-2 cursor-pointer"
             style={{ borderRadius: "10% 90% 10% 90% / 95% 8% 92% 5%" }}
-            // style={{
-            //   clipPath: "polygon(50% 0%, 100% 38%, 82% 100%, 9% 96%, 0% 38%)",
-            // }}
+            onClick={() => {
+              // @ts-ignore
+              fileInputRef!.click();
+            }}
           >
-            <svg viewBox="0 0 16 16" height={80}>
-              <BsUpload color="#852E2C" />
-            </svg>
-            <p className="text-[#852E2C] font-monserrat text-center mt-4 font-semibold">
-              Click here to upload an image
+            {image ? (
+              <Image
+                src={image}
+                alt="Uploaded Image"
+                width={300}
+                height={300}
+              />
+            ) : (
+              <svg viewBox="0 0 16 16" height={80}>
+                <BsUpload color="#852E2C" />
+              </svg>
+            )}
+            <p className="text-secondary font-monserrat text-center mt-4 font-semibold">
+              {image ? "Image uploaded" : "Click here to upload an image"}
             </p>
           </div>
         </div>
