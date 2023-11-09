@@ -26,6 +26,8 @@ import { useGlobalStore } from "@/context/global";
 
 // Type Imports
 import { ScreensTypes } from "@/enums";
+import { ICategory } from "@/types/category.interface";
+import { IFolder } from "@/types/folder.interface";
 
 interface AddProps {}
 
@@ -59,7 +61,7 @@ const AddView: FC<AddProps> = () => {
       return;
     }
 
-    setFolders((prev: any) => [
+    setFolders((prev: IFolder[]) => [
       ...prev,
       {
         id: v4(),
@@ -84,6 +86,7 @@ const AddView: FC<AddProps> = () => {
     toast.success("Folder Added Successfully!");
 
     setCurrentScreen(ScreensTypes.HOME);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [name, image, setFolders, toast, setCurrentScreen]);
 
   /**
@@ -95,18 +98,24 @@ const AddView: FC<AddProps> = () => {
       toast.error("Please type Folder Name");
       return;
     }
-
-    setFolders((prev: any) => {
-      return prev.map((folder: any) => {
+    setFolders((prev: IFolder[]) => {
+      return prev.map((folder: IFolder) => {
         if (folder.id.toString() === toEdit.itemId.toString()) {
-          return { ...folder, name: name, image };
+          return {
+            ...folder,
+            name: name,
+            image,
+            categories: folder.categories.map((category: ICategory) => {
+              return { ...category, image: image };
+            }),
+          };
         }
         return folder;
       });
     });
     toast.success("Folder Updated!");
-
     setCurrentScreen(ScreensTypes.HOME);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [name, image, setFolders, toast, setCurrentScreen, toEdit.itemId]);
 
   /**
@@ -138,7 +147,7 @@ const AddView: FC<AddProps> = () => {
   const selectedFolder = useMemo(() => {
     if (editFolder && isEditing) {
       return folders.find(
-        (folder: any) => folder.id.toString() === toEdit.itemId.toString()
+        (folder: IFolder) => folder.id.toString() === toEdit.itemId.toString()
       );
     }
     return null;
@@ -165,8 +174,15 @@ const AddView: FC<AddProps> = () => {
                 ? "Edit Category Folder"
                 : "Create New Category Folder"}
             </p>
-            <svg viewBox="0 0 15 15" height={25} className="cursor-pointer">
-              <MdCancel color="#852E2C" onClick={handleCancel} />
+            <svg
+              viewBox="0 0 15 15"
+              height={25}
+              className="cursor-pointer"
+            >
+              <MdCancel
+                color="#852E2C"
+                onClick={handleCancel}
+              />
             </svg>
           </div>
           {!isEditing ? (
@@ -214,15 +230,21 @@ const AddView: FC<AddProps> = () => {
             }}
           >
             {image ? (
-              <Image
-                priority={true}
-                src={image}
-                alt="Uploaded Image"
-                width={300}
-                height={300}
-              />
+              <div className="max-h-[250px] max-w-[250px] z-0 border-2 border-[#852E2C] rounded">
+                <Image
+                  priority={true}
+                  src={image}
+                  alt="Uploaded Image"
+                  width={0}
+                  height={0}
+                  style={{ width: "100%", height: "100%" }}
+                />
+              </div>
             ) : (
-              <svg viewBox="0 0 16 16" height={80}>
+              <svg
+                viewBox="0 0 16 16"
+                height={80}
+              >
                 <BsUpload color="#852E2C" />
               </svg>
             )}

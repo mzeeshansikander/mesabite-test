@@ -160,59 +160,69 @@ const HomeView: FC<HomeProps> = () => {
 
   return (
     <Fragment>
-      <div className="w-screen h-full max-w-[390px] mx-auto mb-auto">
-        {/* Body */}
-        <div className="flex-col h-full pt-[18px] px-[20px]">
-          <p className="font-bold text-secondary text-[28px] my-2">YOUR MENU</p>
-          {isSearchActive ? (
-            <input
-              placeholder="Search here..."
-              type="text"
-              value={query}
-              autoFocus={true}
-              onChange={(e) => {
-                setQuery(e.currentTarget.value);
-              }}
-              className="border-2 border-secondary rounded-[15px] h-[37px] w-full bg-transparent focus:outline-none p-2"
-            />
-          ) : (
+      <InfiniteScroll
+        dataLength={dataLimit} // This is important field to render the next data
+        next={fetchMore}
+        hasMore={isSearchActive ? false : dataLimit < dataCount}
+        loader={dataLimit < dataCount ? <h4>Loading...</h4> : null}
+        endMessage={
+          isSearchActive ? null : (
+            <p style={{ textAlign: "center" }}>
+              <b>Yay! You have seen it all</b>
+            </p>
+          )
+        }
+      >
+        <div className="w-screen h-full max-w-[390px] mx-auto mb-auto">
+          {/* Body */}
+          <div className="flex-col h-full pt-[18px] px-[20px]">
+            <p className="font-bold text-secondary text-[28px] my-2">
+              YOUR MENU
+            </p>
+            {isSearchActive ? (
+              <input
+                placeholder="Search here..."
+                type="text"
+                value={query}
+                autoFocus={true}
+                onChange={(e) => {
+                  setQuery(e.currentTarget.value);
+                }}
+                className="border-2 border-secondary rounded-[15px] h-[37px] w-full bg-transparent focus:outline-none p-2"
+              />
+            ) : (
+              <div
+                onClick={() => setIsSearchActive(true)}
+                className="flex flex-row justify-center gap-2 items-center border-2 border-secondary rounded-[15px] h-[37px]"
+              >
+                <BsSearch
+                  color="#852E2C"
+                  className="cursor-pointer"
+                />
+                <p className="text-secondary font-primary uppercase">
+                  search menu
+                </p>
+              </div>
+            )}
+
             <div
-              onClick={() => setIsSearchActive(true)}
-              className="flex flex-row justify-center gap-2 items-center border-2 border-secondary rounded-[15px] h-[37px]"
+              className="flex flex-row gap-2 items-center mt-2 font-bold cursor-pointer"
+              onClick={addFolder}
             >
-              <BsSearch color="#852E2C" className="cursor-pointer" />
-              <p className="text-secondary font-primary uppercase">
-                search menu
+              <svg
+                viewBox="0 0 15 15"
+                height={20}
+              >
+                <IoMdAddCircleOutline
+                  color="#852E2C"
+                  className="cursor-pointer"
+                />
+              </svg>
+              <p className="text-secondary font-sans my-3">
+                Create Category Folder
               </p>
             </div>
-          )}
 
-          <div
-            className="flex flex-row gap-2 items-center mt-2 font-bold cursor-pointer"
-            onClick={addFolder}
-          >
-            <svg viewBox="0 0 15 15" height={20}>
-              <IoMdAddCircleOutline
-                color="#852E2C"
-                className="cursor-pointer"
-              />
-            </svg>
-            <p className="text-secondary font-sans my-3">
-              Create Category Folder
-            </p>
-          </div>
-
-          <InfiniteScroll
-            dataLength={dataCount} // This is important field to render the next data
-            next={fetchMore}
-            hasMore={dataLimit < dataCount}
-            loader={dataLimit < dataCount ? <h4>Loading...</h4> : null}
-            endMessage={
-              <p style={{ textAlign: "center" }}>
-                <b>Yay! You have seen it all</b>
-              </p>
-            }
-          >
             {/* Menu Folders */}
             {queryFolders.map((folder: IFolder, idx: number) => {
               if (idx + 1 > dataLimit) return null;
@@ -247,16 +257,19 @@ const HomeView: FC<HomeProps> = () => {
               style={{ borderRadius: "10% 90% 10% 90% / 95% 8% 92% 10%" }}
               onClick={addCategory}
             >
-              <svg viewBox="0 0 15 15" height={50}>
+              <svg
+                viewBox="0 0 15 15"
+                height={50}
+              >
                 <IoMdAddCircleOutline color="#852E2C" />
               </svg>
               <p className="text-secondary font-monserrat font-semibold max-w-[192px] text-center mt-4">
                 ADD NEW CATEGORY TO YOUR MENU
               </p>
             </div>
-          </InfiniteScroll>
+          </div>
         </div>
-      </div>
+      </InfiniteScroll>
     </Fragment>
   );
 };

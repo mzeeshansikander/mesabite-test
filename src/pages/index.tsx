@@ -16,7 +16,7 @@ export default function Home() {
         <title>Mesabite | Menu</title>
       </Head>
       <main>
-        <div className="h-full min-h-screen w-screen flex flex-col justify-center items-center bg-[#FFF6DF] overflow-y-scroll pb-5">
+        <div className="h-full min-h-screen w-screen flex flex-col justify-start items-center bg-[#FFF6DF] overflow-y-scroll pb-5">
           {/* NavBar */}
           {currentScreen === ScreensTypes.HOME && (
             <nav className="bg-[#FFCD00] flex justify-between items-center px-4 h-[65px] w-screen border-b-0 border-[#852E2C]">
