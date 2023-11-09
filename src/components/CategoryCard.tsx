@@ -1,18 +1,22 @@
-import Image from "next/image";
+// React Imports
 import React from "react";
 
-// Card Static Image
+// Next JS Imports
+import Image from "next/image";
+
+// Assets Imports
 import thumbnail from "../assets/images/thumbnail_01.png";
 
 // React Icon Imports
 import { IoMdSettings } from "react-icons/io";
 import { MdDelete, MdModeEdit } from "react-icons/md";
+import { ICategory } from "@/types/category.interface";
 
 interface IPropsTypes {
-  category: any;
-  handleDelete?: any;
-  handleEdit?: any;
-  handleSettings?: any;
+  category: ICategory;
+  handleDelete?: (id: number) => void;
+  handleEdit?: (type: string, id: number) => void;
+  handleSettings?: (id: number) => void;
 }
 
 function CategoryCard({
@@ -22,12 +26,12 @@ function CategoryCard({
   handleSettings,
 }: IPropsTypes) {
   return (
-    <div className="flex flex-col border-[#852E2C] rounded-[5px] max-h-[274px] my-2 relative">
-      <Image src={thumbnail} alt="" width={0} height={0} />
+    <div className="flex flex-col border-secondary rounded-[5px] max-h-[274px] my-2 relative">
+      <Image src={category.image} alt="Image" width={330} height={275} />
       <div className="flex flex-col w-full absolute bottom-6 px-4">
         <div className="flex items-center justify-between mb-1 w-full">
-          <div className="bg-[#FFCD00] rounded-full flex flex-row w-max p-1 px-3 items-center">
-            <p className="text-[10px] text-[#852E2C]">{`${category.items?.length} items`}</p>
+          <div className="bg-primary rounded-full flex flex-row w-max p-1 px-3 items-center">
+            <p className="text-[10px] text-secondary">{`${category.items?.length} items`}</p>
           </div>
           <div className="flex flex-row gap-2">
             <IoMdSettings
@@ -44,7 +48,7 @@ function CategoryCard({
               className="cursor-pointer"
               onClick={
                 handleEdit
-                  ? () => handleEdit(category.id)
+                  ? () => handleEdit("category", category.id)
                   : () => console.log("No Handler linked!")
               }
             />

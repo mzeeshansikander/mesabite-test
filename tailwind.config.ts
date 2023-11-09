@@ -14,6 +14,11 @@ const config: Config = {
     extend: {
       fontFamily: {
         monserrat: ["var(--font-montserrat)"],
+        primary: "recoleta",
+      },
+      colors: {
+        primary: "#FFCD00",
+        secondary: "#852E2C",
       },
     },
   },

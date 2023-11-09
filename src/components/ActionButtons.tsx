@@ -11,7 +11,7 @@ function ActionButtons({ handleCancel, handleSave }: IPropTypes) {
   return (
     <div className="flex flex-row justify-center gap-3 items-center p-2 h-[92px]">
       <Button
-        className="!bg-[#852E2C] text-white h-[50px] w-[150px]"
+        className="!bg-secondary text-white h-[50px] w-[150px]"
         onClick={
           handleCancel ? handleCancel : () => console.log("No Handler linked!")
         }
@@ -19,7 +19,7 @@ function ActionButtons({ handleCancel, handleSave }: IPropTypes) {
         Cancel
       </Button>
       <Button
-        className=" !bg-[#FFCD00] text-[#852E2C] h-[50px] w-[150px]"
+        className=" !bg-primary text-secondary h-[50px] w-[150px]"
         onClick={
           handleSave ? handleSave : () => console.log("No Handler linked!")
         }

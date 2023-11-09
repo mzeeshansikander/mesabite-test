@@ -1,27 +1,23 @@
 // React Imports
-import { FC, Fragment, useContext, useEffect, useRef, useState } from "react";
-import { BsChevronDown } from "react-icons/bs";
-import { BsSearch } from "react-icons/bs";
-import { IoMdAddCircleOutline } from "react-icons/io";
-import { AiOutlineMenu } from "react-icons/ai";
-import { IoMdSettings } from "react-icons/io";
-import { MdModeEdit } from "react-icons/md";
-import { MdDelete } from "react-icons/md";
+import { FC, Fragment, useCallback, useMemo, useState } from "react";
 
-import img from "../../assets/images/thumbnail_01.png";
-
-// Data import
+// Global context Imports
 import { useGlobalStore } from "@/context/global";
 
-// For ID
-import { v4 } from "uuid";
-
-// Component Imports
+// Custom Component Imports
 import CategoryCard from "@/components/CategoryCard";
-import { ScreensTypes } from "@/enums";
-import { toast } from "react-toastify";
+import FolderCard from "@/components/FolderCard";
 
-// Functions Import
+// Types Imports
+import { ScreensTypes } from "@/enums";
+import { ICategory } from "@/types/category.interface";
+import { IFolder } from "@/types/folder.interface";
+
+// Npm Imports
+import { BsSearch } from "react-icons/bs";
+import { IoMdAddCircleOutline } from "react-icons/io";
+import InfiniteScroll from "react-infinite-scroll-component";
+import { toast } from "react-toastify";
 
 interface HomeProps {}
 
@@ -34,88 +30,159 @@ const HomeView: FC<HomeProps> = () => {
     setCategories,
     setCurrentScreen,
     setToEdit,
+    setIsEditing,
   } = useGlobalStore();
 
-  // If items found in the database
-  // const [haveItems, setHaveItems] = useState<boolean>(true);
   const [isSearchActive, setIsSearchActive] = useState<boolean>(false);
-
-  const [queryCategories, setQueryCategories] = useState<any>(undefined);
-
-  const [queryFolders, setQueryFolders] = useState<any>(undefined);
 
   const [query, setQuery] = useState<string>("");
 
-  const addCategory = () => {
-    setCurrentScreen(ScreensTypes.CATEGORY);
-  };
+  const [dataLimit, setDataLimit] = useState<number>(2);
 
-  const addFolder = () => {
-    setCurrentScreen(ScreensTypes.FOLDER);
-  };
-  const editFolder = (editType: string, itemId: number) => {
-    setToEdit({ editType, itemId });
-    setCurrentScreen(ScreensTypes.FOLDER);
-  };
+  const dataCount = folders.length + categories.length;
 
-  const deleteFolder = (id: string) => {
-    setFolders((prev: any) => prev.filter((folder: any) => folder.id !== id));
-    toast.success("Folder has been deleted!");
-  };
-
-  const deleteCategory = (id: string) => {
-    setCategories((prev: any) =>
-      prev.filter((category: any) => category.id !== id)
-    );
-    toast.success("Category has been deleted!");
-  };
-
-  // const searchInput = useRef();
-
-  const search = () => {
-    setQueryCategories(
-      categories.filter((category: any) =>
+  /**
+   * @description Filter categories based on query
+   * @returns {ICategory[]} Filtered categories
+   */
+  const queryCategories = useMemo(
+    () =>
+      categories.filter((category: ICategory) =>
         category.name.toLowerCase().includes(query)
-      )
-    );
-    setQueryFolders(
-      folders.filter((folder: any) => folder.name.toLowerCase().includes(query))
-    );
-  };
+      ),
+    [categories, query]
+  );
+
+  /**
+   * @description Filter folders and categories based on query
+   * @returns {IFolder[]} Filtered folders
+   * @returns {ICategory[]} Filtered categories inside folders.
+   */
+  const queryFolders = useMemo(() => {
+    return folders.filter((folder: IFolder) => {
+      const folderNameMatch = folder.name.toLowerCase().includes(query);
+
+      const categoryNamesMatch = folder.categories.some((category: ICategory) =>
+        category.name.toLowerCase().includes(query)
+      );
+
+      return folderNameMatch || categoryNamesMatch;
+    });
+  }, [folders, query]);
+
+  /**
+   * @description Add Category to global state
+   * @returns {void}
+   */
+  const addCategory = useCallback(() => {
+    setCurrentScreen(ScreensTypes.CATEGORY);
+    setIsEditing(false);
+  }, [setCurrentScreen]);
+
+  /**
+   * @description Edit a Category in global state
+   * @param {string} editType - The type of edit (e.g., 'edit' or 'add')
+   * @param {number} itemId - The ID of the category to edit
+   * @returns {void}
+   */
+  const editCategory = useCallback(
+    (editType: string, itemId: number) => {
+      setToEdit({ editType, itemId });
+      setIsEditing(true);
+      setCurrentScreen(ScreensTypes.CATEGORY);
+    },
+    [setToEdit, setCurrentScreen]
+  );
+
+  /**
+   * @description Add Folder to global state
+   * @returns {void}
+   */
+  const addFolder = useCallback(() => {
+    setCurrentScreen(ScreensTypes.FOLDER);
+    setIsEditing(false);
+  }, [setCurrentScreen]);
+
+  /**
+   * @description Edit a Folder in global state
+   * @param {string} editType - The type of edit (e.g., 'edit' or 'add')
+   * @param {number} itemId - The ID of the folder to edit
+   * @returns {void}
+   */
+  const editFolder = useCallback(
+    (editType: string, itemId: number) => {
+      setToEdit({ editType, itemId });
+      setIsEditing(true);
+      setCurrentScreen(ScreensTypes.FOLDER);
+    },
+    [setToEdit, setCurrentScreen]
+  );
+
+  /**
+   * @description Delete a Folder from global state
+   * @param {string} id - The ID of the folder to delete
+   * @returns {void}
+   */
+  const deleteFolder = useCallback(
+    (id: number) => {
+      setFolders((prev: IFolder[]) =>
+        prev.filter((folder: IFolder) => folder.id.toString() !== id.toString())
+      );
+      toast.success("Folder has been deleted!");
+    },
+    [setFolders, folders]
+  );
+
+  /**
+   * @description Delete a Category from global state
+   * @param {string} id - The ID of the category to delete
+   * @returns {void}
+   */
+  const deleteCategory = useCallback(
+    (id: number) => {
+      setCategories((prev: ICategory[]) =>
+        prev.filter(
+          (category: ICategory) => category.id.toString() !== id.toString()
+        )
+      );
+      toast.success("Category has been deleted!");
+    },
+    [setCategories, categories]
+  );
+
+  /**
+   * @description Fetch more data and update the data limit in global state
+   * @returns {void}
+   */
+  const fetchMore = useCallback(() => {
+    setDataLimit((prev) => prev + 2);
+  }, []);
 
   return (
     <Fragment>
       <div className="w-screen h-full max-w-[390px] mx-auto mb-auto">
         {/* Body */}
         <div className="flex-col h-full pt-[18px] px-[20px]">
-          <p className="font-bold text-[#852E2C] text-[28px] my-2">YOUR MENU</p>
+          <p className="font-bold text-secondary text-[28px] my-2">YOUR MENU</p>
           {isSearchActive ? (
             <input
               placeholder="Search here..."
               type="text"
               value={query}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                  search();
-                }
-              }}
               onChange={(e) => {
                 setQuery(e.currentTarget.value);
-                if (!e.currentTarget.value) {
-                  setIsSearchActive(false);
-                  setQueryCategories(undefined);
-                  setQueryFolders(undefined);
-                }
               }}
-              className="border-2 border-[#852E2C] rounded-[15px] h-[37px] w-full bg-transparent"
+              className="border-2 border-secondary rounded-[15px] h-[37px] w-full bg-transparent"
             />
           ) : (
             <div
               onClick={() => setIsSearchActive(true)}
-              className="flex flex-row justify-center gap-2 items-center border-2 border-[#852E2C] rounded-[15px] h-[37px]"
+              className="flex flex-row justify-center gap-2 items-center border-2 border-secondary rounded-[15px] h-[37px]"
             >
               <BsSearch color="#852E2C" className="cursor-pointer" />
-              <p className="text-[#852E2C] font-recoleta">SEARCH MENU</p>
+              <p className="text-secondary font-primary uppercase">
+                search menu
+              </p>
             </div>
           )}
 
@@ -129,123 +196,64 @@ const HomeView: FC<HomeProps> = () => {
                 className="cursor-pointer"
               />
             </svg>
-            <p className="text-[#852E2C] font-sans my-3">
+            <p className="text-secondary font-sans my-3">
               Create Category Folder
             </p>
           </div>
 
-          {/* Menu Folders */}
-          {queryFolders
-            ? queryFolders.map((folder: any, idx: number) => (
-                <div
-                  key={`${folder.id} ${idx}`}
-                  className="border-[3px] border-[#852E2C] rounded-[10px] p-3 my-3"
-                >
-                  {/* Folder Header */}
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex flex-row items-center">
-                      <AiOutlineMenu className="text-[#852E2C] font-bold cursor-pointer" />
-                      <p className="font-bold text-[20px] mx-2 text-[#852E2C]">
-                        {folder.name}
-                      </p>
-                    </div>
-                    <div className="flex flex-row gap-2">
-                      <IoMdSettings
-                        color="#852E2C"
-                        className="cursor-pointer"
-                      />
-                      <MdModeEdit
-                        color="#852E2C"
-                        className="cursor-pointer"
-                        onClick={() => editFolder("folder", folder.id)}
-                      />
-                      <MdDelete
-                        color="#852E2C"
-                        className="cursor-pointer"
-                        onClick={() => deleteFolder(folder.id)}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Folder Categories */}
-                  {folder.categories.map((category: any, idx: number) => (
-                    <CategoryCard key={idx} category={category} />
-                  ))}
-                </div>
-              ))
-            : folders.map((folder: any, idx: number) => (
-                <div
-                  key={`${folder.id} ${idx}`}
-                  className="border-[3px] border-[#852E2C] rounded-[10px] p-3 my-3"
-                >
-                  {/* Folder Header */}
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex flex-row items-center">
-                      <AiOutlineMenu className="text-[#852E2C] font-bold" />
-                      <p className="font-bold text-[20px] mx-2 text-[#852E2C]">
-                        {folder.name}
-                      </p>
-                    </div>
-                    <div className="flex flex-row gap-2">
-                      <IoMdSettings
-                        color="#852E2C"
-                        className="cursor-pointer"
-                      />
-                      <MdModeEdit
-                        color="#852E2C"
-                        className="cursor-pointer"
-                        onClick={() => editFolder("folder", folder.id)}
-                      />
-                      <MdDelete
-                        color="#852E2C"
-                        className="cursor-pointer"
-                        onClick={() => deleteFolder(folder.id)}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Folder Categories */}
-                  {folder.categories.map((category: any, idx: number) => (
-                    <CategoryCard key={idx} category={category} />
-                  ))}
-                </div>
-              ))}
-
-          {/* All Categories */}
-          <div className="px-3 my-4">
-            {queryCategories
-              ? queryCategories?.map((category: any, idx: number) => (
-                  <CategoryCard
-                    key={`${category.id}-${idx}`}
-                    category={category}
-                    handleDelete={deleteCategory}
-                  />
-                ))
-              : categories?.map((category: any, idx: number) => (
-                  <CategoryCard
-                    key={`${category.id}-${idx}`}
-                    category={category}
-                    handleDelete={deleteCategory}
-                  />
-                ))}
-          </div>
-
-          {/* Ad New Categories */}
-          <div
-            className="flex flex-col justify-center gap-2 items-center border-2 border-[#852E2C] rounded-[15px] h-[344px] px-2"
-            style={{ borderRadius: "10% 90% 10% 90% / 95% 8% 92% 10%" }}
-            onClick={addCategory}
+          <InfiniteScroll
+            dataLength={dataCount} // This is important field to render the next data
+            next={fetchMore}
+            hasMore={dataLimit < dataCount}
+            loader={dataLimit < dataCount ? <h4>Loading...</h4> : null}
+            endMessage={
+              <p style={{ textAlign: "center" }}>
+                <b>Yay! You have seen it all</b>
+              </p>
+            }
           >
-            <svg viewBox="0 0 15 15" height={50}>
-              <IoMdAddCircleOutline
-                color="#852E2C"
-                className="cursor-pointer"
-              />
-            </svg>
-            <p className="text-[#852E2C] font-monserrat font-semibold max-w-[192px] text-center mt-4">
-              ADD NEW CATEGORY TO YOUR MENU
-            </p>
-          </div>
+            {/* Menu Folders */}
+            {queryFolders.map((folder: IFolder, idx: number) => {
+              if (idx + 1 > dataLimit) return null;
+              return (
+                <FolderCard
+                  key={`${folder.id} ${idx}`}
+                  folder={folder}
+                  handleDelete={deleteFolder}
+                  handleEdit={editFolder}
+                />
+              );
+            })}
+
+            {/* All Categories */}
+            <div className="px-3 my-4">
+              {queryCategories.map((category: ICategory, idx: number) => {
+                // if (idx + 1 + folders.length > dataLimit) return null;
+                return (
+                  <CategoryCard
+                    key={`${category.id}-${idx}`}
+                    category={category}
+                    handleDelete={deleteCategory}
+                    handleEdit={editCategory}
+                  />
+                );
+              })}
+            </div>
+
+            {/* Add New Categories */}
+            <div
+              className="flex flex-col justify-center gap-2 items-center border-2 border-secondary rounded-[15px] h-[344px] px-2 cursor-pointer"
+              style={{ borderRadius: "10% 90% 10% 90% / 95% 8% 92% 10%" }}
+              onClick={addCategory}
+            >
+              <svg viewBox="0 0 15 15" height={50}>
+                <IoMdAddCircleOutline color="#852E2C" />
+              </svg>
+              <p className="text-secondary font-monserrat font-semibold max-w-[192px] text-center mt-4">
+                ADD NEW CATEGORY TO YOUR MENU
+              </p>
+            </div>
+          </InfiniteScroll>
         </div>
       </div>
     </Fragment>
