@@ -3,8 +3,8 @@ import React from "react";
 import { Button } from "flowbite-react";
 
 interface IPropTypes {
-  handleCancel?: any;
-  handleSave?: any;
+  handleCancel?: () => void;
+  handleSave?: () => void;
 }
 
 function ActionButtons({ handleCancel, handleSave }: IPropTypes) {
