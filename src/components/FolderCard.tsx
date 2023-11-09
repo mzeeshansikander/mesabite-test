@@ -1,14 +1,17 @@
-// React Icon Imports
+// Type Imports
 import { IFolder } from "@/types/folder.interface";
+
+// Component Imports
+import CategoryCard from "./CategoryCard";
+
+// React Icon Imports
 import { AiOutlineMenu } from "react-icons/ai";
 import { IoMdSettings } from "react-icons/io";
 import { MdDelete, MdModeEdit } from "react-icons/md";
-import CategoryCard from "./CategoryCard";
-
 interface IPropsTypes {
   folder: IFolder;
   handleDelete?: (id: number) => void;
-  handleEdit?: (type: string, id: number) => void;
+  handleEdit?: (type: string, id: string) => void;
   handleSettings?: (id: number) => void;
 }
 
@@ -29,6 +32,7 @@ function FolderCard({
           </p>
         </div>
         <div className="flex flex-row gap-2">
+          {/* Settings Icon */}
           <IoMdSettings
             color="#852E2C"
             className="cursor-pointer"
@@ -38,15 +42,19 @@ function FolderCard({
                 : () => console.log("No handler linked!")
             }
           />
+
+          {/* Edit Icons */}
           <MdModeEdit
             color="#852E2C"
             className="cursor-pointer"
             onClick={
               handleEdit
-                ? () => handleEdit("folder", folder.id)
+                ? () => handleEdit("folder", folder.id.toString())
                 : () => console.log("No handler linked!")
             }
           />
+
+          {/* Delete Icon */}
           <MdDelete
             color="#852E2C"
             className="cursor-pointer"

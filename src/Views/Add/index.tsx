@@ -1,50 +1,59 @@
 // React Imports
-import ActionButtons from "@/components/ActionButtons";
-import { useGlobalStore } from "@/context/global";
-import { Folders } from "@/data/foods";
-import { ScreensTypes } from "@/enums";
-import { Button } from "flowbite-react";
-import Image from "next/image";
 import {
   FC,
   Fragment,
-  MutableRefObject,
-  useContext,
   useEffect,
   useRef,
   useState,
+  useCallback,
+  useMemo,
 } from "react";
-import { BsChevronDown, BsUpload } from "react-icons/bs";
-import { BsSearch } from "react-icons/bs";
-import { IoMdAddCircleOutline } from "react-icons/io";
-import { MdCancel } from "react-icons/md";
+
+// Next JS Imports
+import Image from "next/image";
+
+// Node package Imports
 import { toast } from "react-toastify";
-
-// For ID
 import { v4 } from "uuid";
+import { BsUpload } from "react-icons/bs";
+import { MdCancel } from "react-icons/md";
 
-// Functions Import
+// Component Imports
+import ActionButtons from "@/components/ActionButtons";
+
+// Context Imports
+import { useGlobalStore } from "@/context/global";
+
+// Type Imports
+import { ScreensTypes } from "@/enums";
 
 interface AddProps {}
 
 const AddView: FC<AddProps> = () => {
-  // States
-  const [name, setName] = useState<string>("");
-
   const { folders, setFolders, setCurrentScreen, toEdit, isEditing } =
     useGlobalStore();
 
+  const editFolder = toEdit?.editType === "folder";
+
+  const [name, setName] = useState<string>("");
+
   const [image, setImage] = useState<string | null>(null);
 
-  let fileInputRef = useRef(null);
+  let fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Form Cancel Handler
-  const handleCancel = () => {
+  /**
+   * @description Cancel the current action and navigate to the home screen
+   * @returns {void}
+   */
+  const handleCancel = useCallback(() => {
     setCurrentScreen(ScreensTypes.HOME);
-  };
+  }, [setCurrentScreen]);
 
-  // Form Save Handler
-  const handleSave = () => {
+  /**
+   * @description Save a new Folder to global state and navigate to the home screen
+   * @returns {void}
+   */
+  const handleSave = useCallback(() => {
     if (!name) {
       toast.error("Please type Folder Name");
       return;
@@ -56,7 +65,7 @@ const AddView: FC<AddProps> = () => {
         id: v4(),
         name: name,
         image:
-          image ??
+          image ||
           "https://nahaj-testing.s3.amazonaws.com/temp/1699496557411.png",
         categories: [
           {
@@ -64,7 +73,7 @@ const AddView: FC<AddProps> = () => {
             name: "Added Pizza",
             description: "Added Folder Category description here!",
             image:
-              image ??
+              image ||
               "https://nahaj-testing.s3.amazonaws.com/temp/1699496557411.png",
             items: [],
             folder: 101,
@@ -75,54 +84,75 @@ const AddView: FC<AddProps> = () => {
     toast.success("Folder Added Successfully!");
 
     setCurrentScreen(ScreensTypes.HOME);
-  };
+  }, [name, image, setFolders, toast, setCurrentScreen]);
 
-  const editFolder = toEdit?.editType === "folder";
-
-  let selectedFolder;
-
-  useEffect(() => {
-    if (editFolder && isEditing) {
-      selectedFolder = folders.filter(
-        (folder: any) => folder.id === toEdit.itemId
-      );
-      setName(selectedFolder[0].name);
-
-      setImage(selectedFolder[0].image);
-    } else {
-      setName("");
-
-      setImage(null);
+  /**
+   * @description Update an existing Folder in global state and navigate to the home screen
+   * @returns {void}
+   */
+  const updateFolder = useCallback(() => {
+    if (!name) {
+      toast.error("Please type Folder Name");
+      return;
     }
-  }, []);
 
-  const updateFolder = () => {
-    setFolders(
-      folders.map((folder: any) => {
-        if (folder.id === toEdit.itemId) {
+    setFolders((prev: any) => {
+      return prev.map((folder: any) => {
+        if (folder.id.toString() === toEdit.itemId.toString()) {
           return { ...folder, name: name, image };
         }
         return folder;
-      })
-    );
+      });
+    });
     toast.success("Folder Updated!");
 
     setCurrentScreen(ScreensTypes.HOME);
-  };
+  }, [name, image, setFolders, toast, setCurrentScreen, toEdit.itemId]);
 
-  const handleImageUpload = (e: any) => {
-    const file = e.target.files[0];
+  /**
+   * @description Handle image upload and set the image for a new or edited Folder
+   * @param {React.ChangeEvent<HTMLInputElement>} e - The input change event with uploaded files
+   * @returns {void}
+   */
+  const handleImageUpload = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
 
-    if (file) {
-      const reader = new FileReader();
+      if (file) {
+        const reader = new FileReader();
 
-      reader.onload = (event: any) => {
-        setImage(event.target.result as string);
-      };
+        reader.onload = (event: any) => {
+          setImage(event.target.result as string);
+        };
 
-      reader.readAsDataURL(file);
+        reader.readAsDataURL(file);
+      }
+    },
+    []
+  );
+
+  /**
+   * @description Get the selected folder for editing using memoization
+   * @returns {object | null} - The selected folder or null if not found
+   */
+  const selectedFolder = useMemo(() => {
+    if (editFolder && isEditing) {
+      return folders.find(
+        (folder: any) => folder.id.toString() === toEdit.itemId.toString()
+      );
     }
-  };
+    return null;
+  }, [editFolder, isEditing, folders, toEdit.itemId]);
+
+  useEffect(() => {
+    if (selectedFolder) {
+      setName(selectedFolder.name);
+      setImage(selectedFolder.image);
+    } else {
+      setName("");
+      setImage(null);
+    }
+  }, [selectedFolder]);
 
   return (
     <Fragment>
@@ -155,6 +185,7 @@ const AddView: FC<AddProps> = () => {
               onChange={(e) => setName(e.currentTarget.value)}
               type="text"
               className="border-secondary h-[40px] my-2 bg-transparent border-2 rounded-full w-full font-monserrat"
+              required
             />
             <p className="text-[#BF5627] w-full text-right text-[10px] font-monserrat">
               {`${name.length}/50`}
@@ -170,19 +201,21 @@ const AddView: FC<AddProps> = () => {
             accept="image/png, image/jpeg"
             onChange={handleImageUpload}
             style={{ display: "none" }}
-            ref={(fileInput: unknown | any) => (fileInputRef = fileInput)}
+            ref={fileInputRef}
           />
 
           <div
             className="flex flex-col justify-center gap-2 items-center border-4 border-secondary rounded-[15px] h-[344px] px-2 my-2 cursor-pointer"
             style={{ borderRadius: "10% 90% 10% 90% / 95% 8% 92% 5%" }}
             onClick={() => {
-              // @ts-ignore
-              fileInputRef!.click();
+              if (fileInputRef.current) {
+                fileInputRef.current.click();
+              }
             }}
           >
             {image ? (
               <Image
+                priority={true}
                 src={image}
                 alt="Uploaded Image"
                 width={300}
@@ -194,7 +227,7 @@ const AddView: FC<AddProps> = () => {
               </svg>
             )}
             <p className="text-secondary font-monserrat text-center mt-4 font-semibold">
-              {image ? "Image uploaded" : "Click here to upload an image"}
+              {image ? "Upload new image" : "Click here to upload an image"}
             </p>
           </div>
         </div>
@@ -202,7 +235,7 @@ const AddView: FC<AddProps> = () => {
         {/* Bottom Action Buttons */}
         <ActionButtons
           handleCancel={handleCancel}
-          handleSave={editFolder ? updateFolder : handleSave}
+          handleSave={editFolder && isEditing ? updateFolder : handleSave}
         />
       </div>
     </Fragment>

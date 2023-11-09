@@ -1,5 +1,7 @@
 // Next JS Imports
 import type { AppProps } from "next/app";
+
+// Global Context Import
 import Context from "../context/global";
 
 // Font Imports

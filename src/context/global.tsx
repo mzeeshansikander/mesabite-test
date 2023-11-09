@@ -1,18 +1,23 @@
 // React Import
 import { Categories, Folders } from "@/data/foods";
+import { ScreensTypes } from "@/enums";
 import { ICategory } from "@/types/category.interface";
 import { IFolder } from "@/types/folder.interface";
 import React, { createContext, useContext, useState } from "react";
 
+interface IToEdit {
+  editType: string;
+  itemId: string;
+}
 interface GlobalContextType {
-  categories: any;
-  setCategories: (categories: any) => void;
-  folders: any;
-  setFolders: (folders: any) => void;
-  currentScreen: any;
-  setCurrentScreen: (currentScreen: any) => void;
-  toEdit: any;
-  setToEdit: (toEdit: any) => void;
+  categories: ICategory[];
+  setCategories: Function;
+  folders: IFolder[] | any[];
+  setFolders: Function;
+  currentScreen: ScreensTypes;
+  setCurrentScreen: (currentScreen: ScreensTypes) => void;
+  toEdit: IToEdit;
+  setToEdit: (toEdit: IToEdit) => void;
   isEditing: boolean;
   setIsEditing: (isEditing: boolean) => void;
 }
@@ -22,11 +27,16 @@ const Context = createContext<GlobalContextType | undefined>(undefined);
 const GlobalStore = ({ children }: { children: React.ReactNode }) => {
   const [categories, setCategories] = useState<ICategory[]>(Categories);
 
-  const [folders, setFolders] = useState<any>(Folders);
+  const [folders, setFolders] = useState<IFolder[] | any[]>(Folders);
 
-  const [currentScreen, setCurrentScreen] = useState<string>("home");
+  const [currentScreen, setCurrentScreen] = useState<ScreensTypes>(
+    ScreensTypes.HOME
+  );
 
-  const [toEdit, setToEdit] = useState<any>();
+  const [toEdit, setToEdit] = useState<IToEdit>({
+    editType: "",
+    itemId: "",
+  });
 
   const [isEditing, setIsEditing] = useState<boolean>(false);
 

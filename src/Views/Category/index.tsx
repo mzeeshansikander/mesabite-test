@@ -1,111 +1,143 @@
 // React Imports
+import { FC, Fragment, useEffect, useRef, useState, useCallback } from "react";
+
+// Next JS Imports
+import Image from "next/image";
+
+// Component Imports
 import ActionButtons from "@/components/ActionButtons";
+
+// Context Imports
 import { useGlobalStore } from "@/context/global";
+
+// Type Imports
 import { ScreensTypes } from "@/enums";
 import { ICategory } from "@/types/category.interface";
-import Image from "next/image";
-import { FC, Fragment, useEffect, useRef, useState } from "react";
+
+// Node package Imports
 import { BsUpload } from "react-icons/bs";
 import { MdCancel } from "react-icons/md";
 import { toast } from "react-toastify";
-
-// For ID
-import { v4 } from "uuid";
-
-// Functions Import
+import { v4 as uuidv4 } from "uuid";
 
 interface IPropTypes {}
 
 const CategoryView: FC<IPropTypes> = () => {
-  // States
+  const { categories, setCategories, setCurrentScreen, toEdit, isEditing } =
+    useGlobalStore();
+
   const [name, setName] = useState<string>("");
 
   const [desc, setDesc] = useState<string>("");
 
-  const { categories, setCategories, setCurrentScreen, toEdit, isEditing } =
-    useGlobalStore();
-
   const [image, setImage] = useState<string | null>(null);
 
-  let fileInputRef = useRef(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Form Cancel Handler
-  const handleCancel = () => {
-    setCurrentScreen(ScreensTypes.HOME);
-  };
+  const editCategory = toEdit?.editType === "category";
 
-  // Form Save Handler
-  const handleSave = () => {
-    if (!name) {
-      toast.error("Please type Category Name");
+  /**
+   * @description Save a new Category to global state and navigate to the home screen
+   * @returns {void}
+   */
+  const handleSave = useCallback(() => {
+    if (!name || !desc || !image) {
+      toast.error("Please fill all the fields");
       return;
     }
-    setCategories((prev: ICategory[]) => [
-      ...prev,
-      {
-        id: v4(),
-        name: name,
-        description: desc,
-        image:
-          image ??
-          "https://nahaj-testing.s3.amazonaws.com/temp/1699496557411.png",
-        items: [],
-      },
+
+    const newCategory = {
+      id: uuidv4(),
+      name,
+      description: desc,
+      image:
+        image ||
+        "https://nahaj-testing.s3.amazonaws.com/temp/1699496557411.png",
+      items: [],
+    };
+
+    setCategories((prevCategories: ICategory[]) => [
+      ...prevCategories,
+      newCategory,
     ]);
     toast.success("Category Added Successfully!");
 
     setCurrentScreen(ScreensTypes.HOME);
-  };
+  }, [name, desc, image, setCurrentScreen, setCategories]);
 
-  const editCategory = toEdit?.editType === "category";
-  let selectedCategory;
+  /**
+   * @description Handle image upload and set the image for a new Category
+   * @param {React.ChangeEvent<HTMLInputElement>} e - The input change event with uploaded files
+   * @returns {void}
+   */
+  const handleImageUpload = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (!e?.target?.files?.length) return;
+
+      const file = e?.target?.files[0] as File;
+
+      if (file) {
+        const reader = new FileReader();
+
+        reader.onload = (event: ProgressEvent<FileReader>) => {
+          setImage(event.target?.result as string);
+        };
+
+        reader.readAsDataURL(file);
+      }
+    },
+    []
+  );
+
+  /**
+   * @description Update an existing Category in global state and navigate to the home screen
+   * @returns {void}
+   */
+  const updateCategory = useCallback(() => {
+    if (!name || !desc || !image) {
+      toast.error("Please fill all the fields");
+      return;
+    }
+
+    setCategories((prevCategories: ICategory[]) => {
+      return prevCategories.map((category: ICategory) => {
+        if (category.id.toString() === toEdit.itemId.toString()) {
+          return { ...category, name, description: desc, image };
+        }
+        return category;
+      });
+    });
+
+    toast.success("Category Updated!");
+    setCurrentScreen(ScreensTypes.HOME);
+  }, [name, desc, image, toEdit.itemId, setCategories, setCurrentScreen]);
+
+  /**
+   * @description Cancel the current action and navigate to the home screen
+   * @returns {void}
+   */
+  const handleCancel = useCallback(() => {
+    setCurrentScreen(ScreensTypes.HOME);
+  }, [setCurrentScreen]);
 
   useEffect(() => {
     if (editCategory && isEditing) {
-      selectedCategory = categories.filter(
-        (category: ICategory) => category.id === toEdit.itemId
+      const selectedCategory = categories.find(
+        (category: ICategory) =>
+          category.id.toString() === toEdit.itemId.toString()
       );
 
-      setImage(selectedCategory[0].image);
-
-      setName(selectedCategory[0].name);
-
-      setDesc(selectedCategory[0].description);
+      if (selectedCategory) {
+        setImage(selectedCategory.image);
+        setName(selectedCategory.name);
+        setDesc(selectedCategory.description);
+      }
     } else {
       setImage(null);
-
       setName("");
-
       setDesc("");
     }
-  }, []);
-
-  const updateCategory = () => {
-    setCategories(
-      categories.map((category: ICategory) => {
-        if (category.id === toEdit.itemId) {
-          return { ...category, name: name, description: desc, image };
-        }
-        return category;
-      })
-    );
-    toast.success("Category Updated!");
-    setCurrentScreen(ScreensTypes.HOME);
-  };
-
-  const handleImageUpload = (e: any) => {
-    const file = e.target.files[0];
-
-    if (file) {
-      const reader = new FileReader();
-
-      reader.onload = (event: any) => {
-        setImage(event.target.result as string);
-      };
-
-      reader.readAsDataURL(file);
-    }
-  };
+  }, [categories, isEditing, toEdit]);
 
   return (
     <Fragment>
@@ -113,15 +145,9 @@ const CategoryView: FC<IPropTypes> = () => {
         {/* Body */}
         <div className="flex-col h-full pt-[18px] px-[20px] bg-[#FFF6DF]">
           <div className="flex flex-row justify-between items-center mt-[30px] mb-[17px]">
-            {isEditing ? (
-              <p className="font-bold text-secondary text-[20px]">
-                Edit Category
-              </p>
-            ) : (
-              <p className="font-bold text-secondary text-[20px]">
-                Add New Category
-              </p>
-            )}
+            <p className="font-bold text-secondary text-[20px]">
+              {isEditing ? "Edit Category" : "Add New Category"}
+            </p>
             <svg viewBox="0 0 15 15" height={25}>
               <MdCancel
                 color="#852E2C"
@@ -140,19 +166,19 @@ const CategoryView: FC<IPropTypes> = () => {
             accept="image/png, image/jpeg"
             onChange={handleImageUpload}
             style={{ display: "none" }}
-            ref={(fileInput: unknown | any) => (fileInputRef = fileInput)}
+            ref={(fileInput) => (fileInputRef.current = fileInput)}
           />
 
           <div
             className="flex flex-col justify-center gap-2 items-center border-4 border-secondary rounded-[15px] h-[344px] px-2 my-2 cursor-pointer"
             style={{ borderRadius: "10% 90% 10% 90% / 95% 8% 92% 5%" }}
             onClick={() => {
-              // @ts-ignore
-              fileInputRef!.click();
+              fileInputRef.current?.click();
             }}
           >
             {image ? (
               <Image
+                priority={true}
                 src={image}
                 alt="Uploaded Image"
                 width={300}
@@ -164,22 +190,11 @@ const CategoryView: FC<IPropTypes> = () => {
               </svg>
             )}
             <p className="text-secondary font-monserrat text-center mt-4 font-semibold">
-              {image ? "Image uploaded" : "Click here to upload an image"}
+              {image ? "Upload new image" : "Click here to upload an image"}
             </p>
           </div>
-          {/* <div
-            className="flex flex-col justify-center gap-2 items-center border-4 border-secondary rounded-[15px] h-[344px] px-2 my-2"
-            style={{ borderRadius: "10% 90% 10% 90% / 95% 8% 92% 5%" }}
-          >
-            <svg viewBox="0 0 16 16" height={80}>
-              <BsUpload color="#852E2C" />
-            </svg>
-            <p className="text-secondary font-monserrat text-center mt-4 font-semibold">
-              Click here to upload an image
-            </p>
-          </div> */}
 
-          {/* Name Input Field  */}
+          {/* Name Input Field */}
           <div className="mb-[37px] mt-[17px]">
             <p className="font-semibold font-monserrat text-secondary">Name</p>
             <input
@@ -193,10 +208,10 @@ const CategoryView: FC<IPropTypes> = () => {
             </p>
           </div>
 
-          {/* Description Input Field  */}
+          {/* Description Input Field */}
           <div className="mb-[37px] mt-[17px]">
             <p className="font-semibold font-monserrat text-secondary">
-              {`Description (Optional)`}
+              Description (Optional)
             </p>
             <textarea
               value={desc}
@@ -210,7 +225,7 @@ const CategoryView: FC<IPropTypes> = () => {
         {/* Bottom Action Buttons */}
         <ActionButtons
           handleCancel={handleCancel}
-          handleSave={editCategory ? updateCategory : handleSave}
+          handleSave={editCategory && isEditing ? updateCategory : handleSave}
         />
       </div>
     </Fragment>

@@ -1,6 +1,6 @@
-import { IFolder } from "@/types/folder.interface";
+import { ICategory } from "@/types/category.interface";
 
-export const Categories = [
+export const Categories: ICategory[] = [
   {
     id: 1,
     name: "Pasta",

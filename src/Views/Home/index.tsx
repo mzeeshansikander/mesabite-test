@@ -13,7 +13,7 @@ import { ScreensTypes } from "@/enums";
 import { ICategory } from "@/types/category.interface";
 import { IFolder } from "@/types/folder.interface";
 
-// Npm Imports
+// Node package Imports
 import { BsSearch } from "react-icons/bs";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -86,7 +86,7 @@ const HomeView: FC<HomeProps> = () => {
    * @returns {void}
    */
   const editCategory = useCallback(
-    (editType: string, itemId: number) => {
+    (editType: string, itemId: string) => {
       setToEdit({ editType, itemId });
       setIsEditing(true);
       setCurrentScreen(ScreensTypes.CATEGORY);
@@ -106,11 +106,11 @@ const HomeView: FC<HomeProps> = () => {
   /**
    * @description Edit a Folder in global state
    * @param {string} editType - The type of edit (e.g., 'edit' or 'add')
-   * @param {number} itemId - The ID of the folder to edit
+   * @param {string} itemId - The ID of the folder to edit
    * @returns {void}
    */
   const editFolder = useCallback(
-    (editType: string, itemId: number) => {
+    (editType: string, itemId: string) => {
       setToEdit({ editType, itemId });
       setIsEditing(true);
       setCurrentScreen(ScreensTypes.FOLDER);
@@ -169,10 +169,11 @@ const HomeView: FC<HomeProps> = () => {
               placeholder="Search here..."
               type="text"
               value={query}
+              autoFocus={true}
               onChange={(e) => {
                 setQuery(e.currentTarget.value);
               }}
-              className="border-2 border-secondary rounded-[15px] h-[37px] w-full bg-transparent"
+              className="border-2 border-secondary rounded-[15px] h-[37px] w-full bg-transparent focus:outline-none p-2"
             />
           ) : (
             <div

@@ -31,6 +31,7 @@ export default function Home() {
                   src="/assets/menuIcon.png"
                 />
               </div>
+
               {/* Language Selection */}
               <div className="flex justify-center items-center gap-2">
                 <div className="w-[24px] h-[24px]">
@@ -47,9 +48,14 @@ export default function Home() {
               </div>
             </nav>
           )}
-          {/* h-screen */}
+
+          {/* home-screen view */}
           {currentScreen === ScreensTypes.HOME && <HomeView />}
+
+          {/* Add-Screen view */}
           {currentScreen === ScreensTypes.FOLDER && <AddView />}
+
+          {/* Category-Screen view */}
           {currentScreen === ScreensTypes.CATEGORY && <CategoryView />}
         </div>
       </main>
