@@ -143,7 +143,7 @@ const CategoryView: FC<IPropTypes> = () => {
     <Fragment>
       <div className="w-screen h-screen max-w-[390px] flex flex-col justify-start">
         {/* Body */}
-        <div className="flex-col h-full pt-[18px] px-[20px] bg-[#FFF6DF]">
+        <div className="flex-col h-full pt-[18px] px-[20px] bg-[#FFF6DF] mb-10">
           <div className="flex flex-row justify-between items-center mt-[30px] mb-[17px]">
             <p className="font-bold text-secondary text-[20px]">
               {isEditing ? "Edit Category" : "Add New Category"}
@@ -180,13 +180,16 @@ const CategoryView: FC<IPropTypes> = () => {
             }}
           >
             {image ? (
-              <Image
-                priority={true}
-                src={image}
-                alt="Uploaded Image"
-                width={300}
-                height={300}
-              />
+              <div className="max-h-[250px] max-w-[250px] z-0 border-2 border-[#852E2C] rounded">
+                <Image
+                  priority={true}
+                  src={image}
+                  alt="Uploaded Image"
+                  width={0}
+                  height={0}
+                  style={{ width: "100%", height: "100%" }}
+                />
+              </div>
             ) : (
               <svg
                 viewBox="0 0 16 16"

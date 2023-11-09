@@ -116,27 +116,6 @@ const AddView: FC<AddProps> = () => {
     setCurrentScreen(ScreensTypes.HOME);
   }, [name, image, setFolders, toast, setCurrentScreen, toEdit.itemId]);
 
-  // const updateFolder = () => {
-  //   if (!name) {
-  //     toast.error("Please type Folder Name");
-  //     return;
-  //   }
-  //   setFolders(
-  //     folders.map((folder: IFolder) => {
-  //       if (folder.id === toEdit.itemId) {
-  //         return {
-  //           ...folder,
-  //           name: name,
-  //           image,
-  //           categories: folder.categories.map((category: ICategory) => {
-  //             return { ...category, image: image };
-  //           }),
-  //         };
-  //       }
-  //       return folder;
-  //     });
-  //   });
-
   /**
    * @description Handle image upload and set the image for a new or edited Folder
    * @param {React.ChangeEvent<HTMLInputElement>} e - The input change event with uploaded files
@@ -249,13 +228,16 @@ const AddView: FC<AddProps> = () => {
             }}
           >
             {image ? (
-              <Image
-                priority={true}
-                src={image}
-                alt="Uploaded Image"
-                width={300}
-                height={300}
-              />
+              <div className="max-h-[250px] max-w-[250px] z-0 border-2 border-[#852E2C] rounded">
+                <Image
+                  priority={true}
+                  src={image}
+                  alt="Uploaded Image"
+                  width={0}
+                  height={0}
+                  style={{ width: "100%", height: "100%" }}
+                />
+              </div>
             ) : (
               <svg
                 viewBox="0 0 16 16"

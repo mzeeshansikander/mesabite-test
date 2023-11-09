@@ -23,13 +23,16 @@ function CategoryCard({
 }: IPropsTypes) {
   return (
     <div className="flex flex-col border-secondary rounded-[5px] max-h-[274px] my-2 relative">
-      <Image
-        src={category.image}
-        alt="Image"
-        width={330}
-        height={275}
-        priority={true}
-      />
+      <div className="border-2 border-[#852E2C] rounded overflow-hidden">
+        <Image
+          src={category.image}
+          alt="Image"
+          width={300}
+          height={300}
+          style={{ height: "100%", width: "100%" }}
+          priority={true}
+        />
+      </div>
       <div
         className="flex flex-col justify-end w-full absolute bottom-0 pb-4 px-4 h-[50%]"
         style={{

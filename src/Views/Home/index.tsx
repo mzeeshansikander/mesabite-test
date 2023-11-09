@@ -163,7 +163,7 @@ const HomeView: FC<HomeProps> = () => {
   return (
     <Fragment>
       <InfiniteScroll
-        dataLength={dataCount} // This is important field to render the next data
+        dataLength={dataLimit} // This is important field to render the next data
         next={fetchMore}
         hasMore={dataLimit < dataCount}
         loader={dataLimit < dataCount ? <h4>Loading...</h4> : null}
