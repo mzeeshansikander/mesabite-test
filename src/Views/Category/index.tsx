@@ -137,7 +137,7 @@ const CategoryView: FC<IPropTypes> = () => {
       setName("");
       setDesc("");
     }
-  }, [categories, isEditing, toEdit]);
+  }, []);
 
   return (
     <Fragment>
@@ -148,7 +148,10 @@ const CategoryView: FC<IPropTypes> = () => {
             <p className="font-bold text-secondary text-[20px]">
               {isEditing ? "Edit Category" : "Add New Category"}
             </p>
-            <svg viewBox="0 0 15 15" height={25}>
+            <svg
+              viewBox="0 0 15 15"
+              height={25}
+            >
               <MdCancel
                 color="#852E2C"
                 onClick={handleCancel}
@@ -185,7 +188,10 @@ const CategoryView: FC<IPropTypes> = () => {
                 height={300}
               />
             ) : (
-              <svg viewBox="0 0 16 16" height={80}>
+              <svg
+                viewBox="0 0 16 16"
+                height={80}
+              >
                 <BsUpload color="#852E2C" />
               </svg>
             )}

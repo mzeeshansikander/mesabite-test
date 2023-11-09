@@ -26,6 +26,8 @@ import { useGlobalStore } from "@/context/global";
 
 // Type Imports
 import { ScreensTypes } from "@/enums";
+import { ICategory } from "@/types/category.interface";
+import { IFolder } from "@/types/folder.interface";
 
 interface AddProps {}
 
@@ -95,19 +97,45 @@ const AddView: FC<AddProps> = () => {
       toast.error("Please type Folder Name");
       return;
     }
-
     setFolders((prev: any) => {
-      return prev.map((folder: any) => {
+      return prev.map((folder: IFolder) => {
         if (folder.id.toString() === toEdit.itemId.toString()) {
-          return { ...folder, name: name, image };
+          return {
+            ...folder,
+            name: name,
+            image,
+            categories: folder.categories.map((category: ICategory) => {
+              return { ...category, image: image };
+            }),
+          };
         }
         return folder;
       });
     });
     toast.success("Folder Updated!");
-
     setCurrentScreen(ScreensTypes.HOME);
   }, [name, image, setFolders, toast, setCurrentScreen, toEdit.itemId]);
+
+  // const updateFolder = () => {
+  //   if (!name) {
+  //     toast.error("Please type Folder Name");
+  //     return;
+  //   }
+  //   setFolders(
+  //     folders.map((folder: IFolder) => {
+  //       if (folder.id === toEdit.itemId) {
+  //         return {
+  //           ...folder,
+  //           name: name,
+  //           image,
+  //           categories: folder.categories.map((category: ICategory) => {
+  //             return { ...category, image: image };
+  //           }),
+  //         };
+  //       }
+  //       return folder;
+  //     });
+  //   });
 
   /**
    * @description Handle image upload and set the image for a new or edited Folder
@@ -165,8 +193,15 @@ const AddView: FC<AddProps> = () => {
                 ? "Edit Category Folder"
                 : "Create New Category Folder"}
             </p>
-            <svg viewBox="0 0 15 15" height={25} className="cursor-pointer">
-              <MdCancel color="#852E2C" onClick={handleCancel} />
+            <svg
+              viewBox="0 0 15 15"
+              height={25}
+              className="cursor-pointer"
+            >
+              <MdCancel
+                color="#852E2C"
+                onClick={handleCancel}
+              />
             </svg>
           </div>
           {!isEditing ? (
@@ -222,7 +257,10 @@ const AddView: FC<AddProps> = () => {
                 height={300}
               />
             ) : (
-              <svg viewBox="0 0 16 16" height={80}>
+              <svg
+                viewBox="0 0 16 16"
+                height={80}
+              >
                 <BsUpload color="#852E2C" />
               </svg>
             )}

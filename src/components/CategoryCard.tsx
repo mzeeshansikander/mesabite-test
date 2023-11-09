@@ -30,44 +30,53 @@ function CategoryCard({
         height={275}
         priority={true}
       />
-      <div className="flex flex-col w-full absolute bottom-6 px-4">
+      <div
+        className="flex flex-col justify-end w-full absolute bottom-0 pb-4 px-4 h-[50%]"
+        style={{
+          background: "linear-gradient(hsla(0, 0%, 100%, 0), 20%, #852E2C",
+        }}
+      >
         <div className="flex items-center justify-between mb-1 w-full">
           <div className="bg-primary rounded-full flex flex-row w-max p-1 px-3 items-center">
             <p className="text-[10px] text-secondary">{`${category.items?.length} items`}</p>
           </div>
           <div className="flex flex-row gap-2">
-            {/* Settings Icon */}
-            <IoMdSettings
-              color="#FFFFFF"
-              className="cursor-pointer"
-              onClick={
-                handleSettings
-                  ? () => handleSettings(category.id)
-                  : () => console.log("No Handler linked!")
-              }
-            />
-
-            {/* Edit Icon */}
-            <MdModeEdit
-              color="#FFFFFF"
-              className="cursor-pointer"
-              onClick={
-                handleEdit
-                  ? () => handleEdit("category", category.id.toString())
-                  : () => console.log("No Handler linked!")
-              }
-            />
-
-            {/* Delete Icon */}
-            <MdDelete
-              color="#FFFFFF"
-              className="cursor-pointer"
-              onClick={
-                handleDelete
-                  ? () => handleDelete(category.id)
-                  : () => console.log("No Handler linked!")
-              }
-            />
+            <div className="rounded-full bg-white p-1">
+              {/* Settings Icon */}
+              <IoMdSettings
+                color="#852E2C"
+                className="cursor-pointer"
+                onClick={
+                  handleSettings
+                    ? () => handleSettings(category.id)
+                    : () => console.log("No Handler linked!")
+                }
+              />
+            </div>
+            <div className="rounded-full bg-white p-1">
+              {/* Edit Icon */}
+              <MdModeEdit
+                color="#852E2C"
+                className="cursor-pointer"
+                onClick={
+                  handleEdit
+                    ? () => handleEdit("category", category.id.toString())
+                    : () => console.log("No Handler linked!")
+                }
+              />
+            </div>
+            <div className="rounded-full bg-white p-1">
+              {/* Delete Icon */}
+              <MdDelete
+                color="#852E2C"
+                className="cursor-pointer"
+                onClick={
+                  handleDelete
+                    ? () => handleDelete(category.id)
+                    : () => console.log("No Handler linked!")
+                }
+              />
+            </div>
           </div>
         </div>
 
