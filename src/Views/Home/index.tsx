@@ -41,8 +41,6 @@ const HomeView: FC<HomeProps> = () => {
 
   const dataCount = folders.length + categories.length;
 
-  console.log({ dataLimit, dataCount });
-
   /**
    * @description Filter categories based on query
    * @returns {ICategory[]} Filtered categories
@@ -165,12 +163,14 @@ const HomeView: FC<HomeProps> = () => {
       <InfiniteScroll
         dataLength={dataLimit} // This is important field to render the next data
         next={fetchMore}
-        hasMore={dataLimit < dataCount}
+        hasMore={isSearchActive ? false : dataLimit < dataCount}
         loader={dataLimit < dataCount ? <h4>Loading...</h4> : null}
         endMessage={
-          <p style={{ textAlign: "center" }}>
-            <b>Yay! You have seen it all</b>
-          </p>
+          isSearchActive ? null : (
+            <p style={{ textAlign: "center" }}>
+              <b>Yay! You have seen it all</b>
+            </p>
+          )
         }
       >
         <div className="w-screen h-full max-w-[390px] mx-auto mb-auto">
