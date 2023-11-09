@@ -61,7 +61,7 @@ const AddView: FC<AddProps> = () => {
       return;
     }
 
-    setFolders((prev: any) => [
+    setFolders((prev: IFolder[]) => [
       ...prev,
       {
         id: v4(),
@@ -86,6 +86,7 @@ const AddView: FC<AddProps> = () => {
     toast.success("Folder Added Successfully!");
 
     setCurrentScreen(ScreensTypes.HOME);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [name, image, setFolders, toast, setCurrentScreen]);
 
   /**
@@ -97,7 +98,7 @@ const AddView: FC<AddProps> = () => {
       toast.error("Please type Folder Name");
       return;
     }
-    setFolders((prev: any) => {
+    setFolders((prev: IFolder[]) => {
       return prev.map((folder: IFolder) => {
         if (folder.id.toString() === toEdit.itemId.toString()) {
           return {
@@ -114,6 +115,7 @@ const AddView: FC<AddProps> = () => {
     });
     toast.success("Folder Updated!");
     setCurrentScreen(ScreensTypes.HOME);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [name, image, setFolders, toast, setCurrentScreen, toEdit.itemId]);
 
   /**
@@ -145,7 +147,7 @@ const AddView: FC<AddProps> = () => {
   const selectedFolder = useMemo(() => {
     if (editFolder && isEditing) {
       return folders.find(
-        (folder: any) => folder.id.toString() === toEdit.itemId.toString()
+        (folder: IFolder) => folder.id.toString() === toEdit.itemId.toString()
       );
     }
     return null;

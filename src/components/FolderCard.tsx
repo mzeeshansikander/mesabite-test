@@ -8,6 +8,10 @@ import CategoryCard from "./CategoryCard";
 import { AiOutlineMenu } from "react-icons/ai";
 import { IoMdSettings } from "react-icons/io";
 import { MdDelete, MdModeEdit } from "react-icons/md";
+
+// Type Imports
+import { ICategory } from "@/types/category.interface";
+
 interface IPropsTypes {
   folder: IFolder;
   handleDelete?: (id: number) => void;
@@ -68,8 +72,11 @@ function FolderCard({
       </div>
 
       {/* Folder Categories */}
-      {folder.categories.map((category: any, idx: number) => (
-        <CategoryCard key={idx} category={category} />
+      {folder.categories.map((category: ICategory, idx: number) => (
+        <CategoryCard
+          key={idx}
+          category={category}
+        />
       ))}
     </div>
   );
