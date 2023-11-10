@@ -23,7 +23,7 @@ function CategoryCard({
 }: IPropsTypes) {
   return (
     <div className="flex flex-col border-secondary rounded-[5px] max-h-[274px] my-2 relative">
-      <div className="border-2 border-[#852E2C] rounded overflow-hidden">
+      <div className=" rounded overflow-hidden">
         <Image
           src={category.image}
           alt="Image"

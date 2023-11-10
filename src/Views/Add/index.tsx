@@ -174,15 +174,8 @@ const AddView: FC<AddProps> = () => {
                 ? "Edit Category Folder"
                 : "Create New Category Folder"}
             </p>
-            <svg
-              viewBox="0 0 15 15"
-              height={25}
-              className="cursor-pointer"
-            >
-              <MdCancel
-                color="#852E2C"
-                onClick={handleCancel}
-              />
+            <svg viewBox="0 0 15 15" height={25} className="cursor-pointer">
+              <MdCancel color="#852E2C" onClick={handleCancel} />
             </svg>
           </div>
           {!isEditing ? (
@@ -230,21 +223,18 @@ const AddView: FC<AddProps> = () => {
             }}
           >
             {image ? (
-              <div className="max-h-[250px] max-w-[250px] z-0 border-2 border-[#852E2C] rounded">
+              <div className="max-h-[250px] max-w-[250px] z-0  rounded">
                 <Image
                   priority={true}
                   src={image}
                   alt="Uploaded Image"
-                  width={0}
-                  height={0}
+                  width={320}
+                  height={350}
                   style={{ width: "100%", height: "100%" }}
                 />
               </div>
             ) : (
-              <svg
-                viewBox="0 0 16 16"
-                height={80}
-              >
+              <svg viewBox="0 0 16 16" height={80}>
                 <BsUpload color="#852E2C" />
               </svg>
             )}
